@@ -118,13 +118,20 @@ class EnergiaIrelandScraper(BaseScraper):
 
 
 class PinergyScraper(BaseScraper):
-    """Scraper for Pinergy."""
-    
+    """Scraper for Pinergy.
+
+    Note: Pinergy website is a Single Page Application (SPA) rendered with JavaScript.
+    The /electricity-plans/ path returns 404. Using fallback data instead of scraping.
+    Actual plans can be viewed at https://pinergy.ie with JavaScript enabled.
+    """
+
     def __init__(self):
-        super().__init__('Pinergy', 'https://www.pinergy.ie')
-    
+        super().__init__('Pinergy', 'https://pinergy.ie')
+
     def scrape(self) -> List[Dict]:
-        url = 'https://www.pinergy.ie/electricity-plans/'
+        url = 'https://pinergy.ie/'
+        # Note: This is fallback data. Pinergy site uses SPA rendering, so direct scraping not possible.
+        # Visit https://pinergy.ie and navigate to "For Home" > "Compare Energy Plans" to see live data
         tariffs = [
             self.create_tariff('Pinergy Standard Plan', 26.0, night_rate=14.8, standing_charge=42.5, pso_levy=10.8, source_url=url),
             self.create_tariff('Pinergy Flex Plan', 27.0, night_rate=15.2, standing_charge=43.0, pso_levy=11.0, discount={'percent': 5, 'months': 12}, source_url=url),
