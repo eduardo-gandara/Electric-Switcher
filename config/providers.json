@@ -3,45 +3,44 @@
     {
       "name": "Bord Gáis Energy",
       "domain": "https://www.bordgais.ie",
-      "official_urls": [
-        "https://www.bordgais.ie/"
-      ]
+      "official_urls": ["https://www.bordgais.ie/"],
+      "status": "BLOCKED - SSL connection error",
+      "data_source": "fallback_verified"
     },
     {
       "name": "Electric Ireland",
       "domain": "https://www.electricireland.ie",
-      "official_urls": [
-        "https://www.electricireland.ie/"
-      ]
+      "official_urls": ["https://www.electricireland.ie/"],
+      "status": "✅ ACCESSIBLE (200)",
+      "data_source": "fallback_verified"
     },
     {
       "name": "SSE Airtricity",
       "domain": "https://www.sseairtricity.com",
-      "official_urls": [
-        "https://www.sseairtricity.com/"
-      ]
+      "official_urls": ["https://www.sseairtricity.com/"],
+      "status": "✅ ACCESSIBLE (200)",
+      "data_source": "fallback_verified"
     },
     {
       "name": "Energia",
       "domain": "https://www.energia.ie",
-      "official_urls": [
-        "https://www.energia.ie/"
-      ]
+      "official_urls": ["https://www.energia.ie/"],
+      "status": "✅ ACCESSIBLE (200)",
+      "data_source": "fallback_verified"
     },
     {
       "name": "Pinergy",
       "domain": "https://pinergy.ie",
-      "official_urls": [
-        "https://pinergy.ie/tariffs-and-eab/",
-        "https://pinergy.ie/"
-      ]
+      "official_urls": ["https://pinergy.ie/tariffs-and-eab/", "https://pinergy.ie/"],
+      "status": "BLOCKED - 403 Forbidden (anti-scraping)",
+      "data_source": "fallback_verified"
     },
     {
       "name": "Evoke Energy",
       "domain": "https://www.evokeenergy.ie",
-      "official_urls": [
-        "https://www.evokeenergy.ie/"
-      ]
+      "official_urls": ["https://www.evokeenergy.ie/"],
+      "status": "BLOCKED - Connection error",
+      "data_source": "fallback_verified"
     }
   ]
 }
