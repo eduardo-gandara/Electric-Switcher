@@ -29,7 +29,22 @@
       "Bash(python -c \"from src.simulation_engine import SimulationEngine; print\\('OK'\\)\")",
       "Bash(curl -s -X GET http://localhost:5000/api/health)",
       "Bash(killall python *)",
-      "Bash(/home/gandara/Projects/Electric-Switcher/venv/bin/python /home/gandara/Projects/Electric-Switcher/app.py)"
+      "Bash(/home/gandara/Projects/Electric-Switcher/venv/bin/python /home/gandara/Projects/Electric-Switcher/app.py)",
+      "Bash(git commit -m ' *)",
+      "Bash(gh repo *)",
+      "Bash(git rm *)",
+      "Bash(git commit -m 'chore: remove uploaded CSV files from repository *)",
+      "Bash(git push *)",
+      "Bash(git commit -m 'chore: add .gitkeep to uploads directory *)",
+      "Bash(git commit -m 'chore: add .gitignore to exclude uploads and generated files *)",
+      "Bash(git commit -m 'fix: update Pinergy scraper URL and add SPA note *)",
+      "Bash(git commit -m 'feat: implement real-time Selenium scraper for Pinergy tariffs *)",
+      "Bash(python -c ' *)",
+      "Bash(python3 -c ' *)",
+      "Bash(git commit -m 'fix: make Selenium optional and provide fallback data for Pinergy *)",
+      "Bash(pkill -f \"app.py\")",
+      "Bash(pkill -f app.py)",
+      "Bash(git commit -m 'Improve tariff rate display in modal details *)"
     ]
   }
 }

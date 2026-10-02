@@ -475,8 +475,8 @@
             html += `<div class="detail-row"><div class="detail-label">Tariff Name</div><div class="detail-value"><strong>${tariff.plan_name}</strong></div></div>`;
             html += `<div class="detail-row"><div class="detail-label">Supplier</div><div class="detail-value">${tariff.supplier}</div></div>`;
             html += `<div class="detail-row"><div class="detail-label">Day Rate (ex VAT)</div><div class="detail-value">${rates.day || '-'} c/kWh</div></div>`;
-            html += `<div class="detail-row"><div class="detail-label">Night Rate (ex VAT)</div><div class="detail-value">${rates.night || '-'} c/kWh</div></div>`;
-            html += `<div class="detail-row"><div class="detail-label">Peak Rate (ex VAT)</div><div class="detail-value">${rates.peak || '-'} c/kWh</div></div>`;
+            if (rates.night) html += `<div class="detail-row"><div class="detail-label">Night Rate (ex VAT)</div><div class="detail-value">${rates.night} c/kWh</div></div>`;
+            if (rates.peak) html += `<div class="detail-row"><div class="detail-label">Peak Rate (ex VAT)</div><div class="detail-value">${rates.peak} c/kWh</div></div>`;
             html += `<div class="detail-row"><div class="detail-label">Standing Charge</div><div class="detail-value">${tariff.standing_charge_c_per_day || '-'} c/day</div></div>`;
             html += `<div class="detail-row"><div class="detail-label">PSO Levy</div><div class="detail-value">${tariff.pso_levy_eur_per_month || '-'} €/month</div></div>`;
 

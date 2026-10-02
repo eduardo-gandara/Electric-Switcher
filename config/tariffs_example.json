@@ -1,13 +1,13 @@
 {
-  "extracted_at": "2026-10-02T03:34:23.275636",
-  "total_collected": 24,
+  "extracted_at": "2026-10-02T10:12:10.177555",
+  "total_collected": 23,
   "total_rejected": 0,
   "tariffs": [
     {
       "supplier": "Bord Gáis Energy",
       "plan_name": "Smart All Day",
       "source_url": "https://www.bordgais.ie/en/residential/electricity/electricity-plans/",
-      "extracted_at": "2026-10-02T03:34:23.275834",
+      "extracted_at": "2026-10-02T10:12:10.177712",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 27.5,
         "night": 15.2,
@@ -29,7 +29,7 @@
       "supplier": "Bord Gáis Energy",
       "plan_name": "Smart Night",
       "source_url": "https://www.bordgais.ie/en/residential/electricity/electricity-plans/",
-      "extracted_at": "2026-10-02T03:34:23.275834",
+      "extracted_at": "2026-10-02T10:12:10.177712",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 25.0,
         "night": 12.5,
@@ -48,7 +48,7 @@
       "supplier": "Bord Gáis Energy",
       "plan_name": "Smart Max",
       "source_url": "https://www.bordgais.ie/en/residential/electricity/electricity-plans/",
-      "extracted_at": "2026-10-02T03:34:23.275834",
+      "extracted_at": "2026-10-02T10:12:10.177712",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 29.0,
         "night": 18.0,
@@ -70,7 +70,7 @@
       "supplier": "Bord Gáis Energy",
       "plan_name": "Smart Budget",
       "source_url": "https://www.bordgais.ie/en/residential/electricity/electricity-plans/",
-      "extracted_at": "2026-10-02T03:34:23.275834",
+      "extracted_at": "2026-10-02T10:12:10.177712",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 26.0,
         "night": 14.0,
@@ -89,7 +89,7 @@
       "supplier": "Electric Ireland",
       "plan_name": "Smart All Day Electricity Discount",
       "source_url": "https://www.electricireland.ie/ei/home/electricity/plans/",
-      "extracted_at": "2026-10-02T03:34:23.275883",
+      "extracted_at": "2026-10-02T10:12:10.177747",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 30.78,
         "night": 30.78,
@@ -111,7 +111,7 @@
       "supplier": "Electric Ireland",
       "plan_name": "Value Plan",
       "source_url": "https://www.electricireland.ie/ei/home/electricity/plans/",
-      "extracted_at": "2026-10-02T03:34:23.275883",
+      "extracted_at": "2026-10-02T10:12:10.177747",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 28.5,
         "night": 15.5,
@@ -130,7 +130,7 @@
       "supplier": "Electric Ireland",
       "plan_name": "Smart Saver Plan",
       "source_url": "https://www.electricireland.ie/ei/home/electricity/plans/",
-      "extracted_at": "2026-10-02T03:34:23.275883",
+      "extracted_at": "2026-10-02T10:12:10.177747",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 26.0,
         "night": 13.0,
@@ -152,7 +152,7 @@
       "supplier": "Electric Ireland",
       "plan_name": "Premium Energy Plan",
       "source_url": "https://www.electricireland.ie/ei/home/electricity/plans/",
-      "extracted_at": "2026-10-02T03:34:23.275883",
+      "extracted_at": "2026-10-02T10:12:10.177747",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 31.5,
         "night": 17.0,
@@ -171,7 +171,7 @@
       "supplier": "SSE Airtricity",
       "plan_name": "Standard Electricity Plan",
       "source_url": "https://www.sseairtricity.com/ie/home/electricity/compare-plans/",
-      "extracted_at": "2026-10-02T03:34:23.275915",
+      "extracted_at": "2026-10-02T10:12:10.177769",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 27.0,
         "night": 15.5,
@@ -190,7 +190,7 @@
       "supplier": "SSE Airtricity",
       "plan_name": "Smart Meter Plan",
       "source_url": "https://www.sseairtricity.com/ie/home/electricity/compare-plans/",
-      "extracted_at": "2026-10-02T03:34:23.275915",
+      "extracted_at": "2026-10-02T10:12:10.177769",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 25.5,
         "night": 14.5,
@@ -209,7 +209,7 @@
       "supplier": "SSE Airtricity",
       "plan_name": "Family Plan",
       "source_url": "https://www.sseairtricity.com/ie/home/electricity/compare-plans/",
-      "extracted_at": "2026-10-02T03:34:23.275915",
+      "extracted_at": "2026-10-02T10:12:10.177769",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 28.5,
         "night": 16.5,
@@ -231,7 +231,7 @@
       "supplier": "SSE Airtricity",
       "plan_name": "Eco Plan",
       "source_url": "https://www.sseairtricity.com/ie/home/electricity/compare-plans/",
-      "extracted_at": "2026-10-02T03:34:23.275915",
+      "extracted_at": "2026-10-02T10:12:10.177769",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 24.0,
         "night": 13.5,
@@ -250,7 +250,7 @@
       "supplier": "Energia",
       "plan_name": "Energia Standard",
       "source_url": "https://www.energia.ie/residential/electricity/plans/",
-      "extracted_at": "2026-10-02T03:34:23.275945",
+      "extracted_at": "2026-10-02T10:12:10.177788",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 26.5,
         "night": 15.0,
@@ -269,7 +269,7 @@
       "supplier": "Energia",
       "plan_name": "Energia Fixed",
       "source_url": "https://www.energia.ie/residential/electricity/plans/",
-      "extracted_at": "2026-10-02T03:34:23.275945",
+      "extracted_at": "2026-10-02T10:12:10.177788",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 27.5,
         "night": 15.5,
@@ -291,7 +291,7 @@
       "supplier": "Energia",
       "plan_name": "Energia Smart",
       "source_url": "https://www.energia.ie/residential/electricity/plans/",
-      "extracted_at": "2026-10-02T03:34:23.275945",
+      "extracted_at": "2026-10-02T10:12:10.177788",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 25.5,
         "night": 14.5,
@@ -310,7 +310,7 @@
       "supplier": "Energia",
       "plan_name": "Energia Green",
       "source_url": "https://www.energia.ie/residential/electricity/plans/",
-      "extracted_at": "2026-10-02T03:34:23.275945",
+      "extracted_at": "2026-10-02T10:12:10.177788",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 26.0,
         "night": 14.8,
@@ -327,88 +327,85 @@
     },
     {
       "supplier": "Pinergy",
-      "plan_name": "Pinergy Standard Plan",
-      "source_url": "https://www.pinergy.ie/electricity-plans/",
-      "extracted_at": "2026-10-02T03:34:23.275972",
+      "plan_name": "Standard 24 Hr Urban",
+      "source_url": "https://pinergy.ie/tariffs-and-eab/",
+      "extracted_at": "2026-10-02T10:12:10.177809",
       "unit_rates_c_per_kwh_ex_vat": {
-        "day": 26.0,
-        "night": 14.8,
+        "day": 42.02,
+        "night": null,
         "peak": null
       },
-      "standing_charge_c_per_day": 42.5,
-      "pso_levy_eur_per_month": 10.8,
+      "standing_charge_c_per_day": 71.25,
+      "pso_levy_eur_per_month": 0.048,
       "discount": null,
       "cashback_eur": 0.0,
       "exit_fee_eur": 0.0,
       "contract_months": 12,
-      "bands": null,
+      "bands": {
+        "day": [
+          "00:00",
+          "23:59"
+        ]
+      },
       "conditions": []
     },
     {
       "supplier": "Pinergy",
-      "plan_name": "Pinergy Flex Plan",
-      "source_url": "https://www.pinergy.ie/electricity-plans/",
-      "extracted_at": "2026-10-02T03:34:23.275972",
+      "plan_name": "Standard 24 Hr Rural",
+      "source_url": "https://pinergy.ie/tariffs-and-eab/",
+      "extracted_at": "2026-10-02T10:12:10.177809",
       "unit_rates_c_per_kwh_ex_vat": {
-        "day": 27.0,
-        "night": 15.2,
+        "day": 42.02,
+        "night": null,
         "peak": null
       },
-      "standing_charge_c_per_day": 43.0,
-      "pso_levy_eur_per_month": 11.0,
-      "discount": {
-        "percent": 5,
-        "months": 12
-      },
-      "cashback_eur": 0.0,
-      "exit_fee_eur": 0.0,
-      "contract_months": 12,
-      "bands": null,
-      "conditions": []
-    },
-    {
-      "supplier": "Pinergy",
-      "plan_name": "Pinergy Smart Plan",
-      "source_url": "https://www.pinergy.ie/electricity-plans/",
-      "extracted_at": "2026-10-02T03:34:23.275972",
-      "unit_rates_c_per_kwh_ex_vat": {
-        "day": 25.0,
-        "night": 14.0,
-        "peak": null
-      },
-      "standing_charge_c_per_day": 41.5,
-      "pso_levy_eur_per_month": 10.5,
+      "standing_charge_c_per_day": 78.87,
+      "pso_levy_eur_per_month": 0.048,
       "discount": null,
       "cashback_eur": 0.0,
       "exit_fee_eur": 0.0,
       "contract_months": 12,
-      "bands": null,
+      "bands": {
+        "day": [
+          "00:00",
+          "23:59"
+        ]
+      },
       "conditions": []
     },
     {
       "supplier": "Pinergy",
-      "plan_name": "Pinergy Plus Plan",
-      "source_url": "https://www.pinergy.ie/electricity-plans/",
-      "extracted_at": "2026-10-02T03:34:23.275972",
+      "plan_name": "Urban NightSaver",
+      "source_url": "https://pinergy.ie/tariffs-and-eab/",
+      "extracted_at": "2026-10-02T10:12:10.177809",
       "unit_rates_c_per_kwh_ex_vat": {
-        "day": 28.0,
-        "night": 16.0,
+        "day": 43.15,
+        "night": 30.63,
         "peak": null
       },
-      "standing_charge_c_per_day": 44.0,
-      "pso_levy_eur_per_month": 11.5,
+      "standing_charge_c_per_day": 77.65,
+      "pso_levy_eur_per_month": 0.048,
       "discount": null,
       "cashback_eur": 0.0,
       "exit_fee_eur": 0.0,
       "contract_months": 12,
-      "bands": null,
+      "bands": {
+        "day": [
+          "09:00",
+          "21:00"
+        ],
+        "night": [
+          "21:00",
+          "09:00"
+        ]
+      },
       "conditions": []
     },
     {
       "supplier": "Evoke Energy",
       "plan_name": "Evoke Basic",
       "source_url": "https://www.evokeenergy.ie/electricity/",
-      "extracted_at": "2026-10-02T03:34:23.276001",
+      "extracted_at": "2026-10-02T10:12:10.177830",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 27.0,
         "night": 15.3,
@@ -427,7 +424,7 @@
       "supplier": "Evoke Energy",
       "plan_name": "Evoke Plus",
       "source_url": "https://www.evokeenergy.ie/electricity/",
-      "extracted_at": "2026-10-02T03:34:23.276001",
+      "extracted_at": "2026-10-02T10:12:10.177830",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 25.8,
         "night": 14.8,
@@ -449,7 +446,7 @@
       "supplier": "Evoke Energy",
       "plan_name": "Evoke Premium",
       "source_url": "https://www.evokeenergy.ie/electricity/",
-      "extracted_at": "2026-10-02T03:34:23.276001",
+      "extracted_at": "2026-10-02T10:12:10.177830",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 28.5,
         "night": 16.2,
@@ -468,7 +465,7 @@
       "supplier": "Evoke Energy",
       "plan_name": "Evoke Economy",
       "source_url": "https://www.evokeenergy.ie/electricity/",
-      "extracted_at": "2026-10-02T03:34:23.276001",
+      "extracted_at": "2026-10-02T10:12:10.177830",
       "unit_rates_c_per_kwh_ex_vat": {
         "day": 24.5,
         "night": 13.8,
