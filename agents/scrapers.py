@@ -68,7 +68,7 @@ class BordGaisScraper(BaseScraper):
         super().__init__('Bord Gáis Energy', 'https://www.bordgais.ie')
     
     def scrape(self) -> List[Dict]:
-        url = 'https://www.bordgais.ie/en/residential/electricity/electricity-plans/'
+        url = 'https://www.bordgais.ie/'
         tariffs = [
             self.create_tariff('Smart All Day', 27.5, night_rate=15.2, standing_charge=43.5, pso_levy=11.5, discount={'percent': 32, 'months': 12}, source_url=url),
             self.create_tariff('Smart Night', 25.0, night_rate=12.5, standing_charge=42.0, pso_levy=11.0, source_url=url),
@@ -85,7 +85,7 @@ class ElectricIrelandScraper(BaseScraper):
         super().__init__('Electric Ireland', 'https://www.electricireland.ie')
     
     def scrape(self) -> List[Dict]:
-        url = 'https://www.electricireland.ie/ei/home/electricity/plans/'
+        url = 'https://www.electricireland.ie/'
         tariffs = [
             self.create_tariff('Smart All Day Electricity Discount', 30.78, night_rate=30.78, standing_charge=48.0, pso_levy=11.5, discount={'percent': 26, 'months': 12}, source_url=url),
             self.create_tariff('Value Plan', 28.5, night_rate=15.5, standing_charge=46.0, pso_levy=11.0, source_url=url),
@@ -102,7 +102,7 @@ class SSEAirticityScraper(BaseScraper):
         super().__init__('SSE Airtricity', 'https://www.sseairtricity.com')
     
     def scrape(self) -> List[Dict]:
-        url = 'https://www.sseairtricity.com/ie/home/electricity/compare-plans/'
+        url = 'https://www.sseairtricity.com/'
         tariffs = [
             self.create_tariff('Standard Electricity Plan', 27.0, night_rate=15.5, standing_charge=43.0, pso_levy=11.0, source_url=url),
             self.create_tariff('Smart Meter Plan', 25.5, night_rate=14.5, standing_charge=42.0, pso_levy=10.8, source_url=url),
@@ -119,7 +119,7 @@ class EnergiaIrelandScraper(BaseScraper):
         super().__init__('Energia', 'https://www.energia.ie')
     
     def scrape(self) -> List[Dict]:
-        url = 'https://www.energia.ie/residential/electricity/plans/'
+        url = 'https://www.energia.ie/'
         tariffs = [
             self.create_tariff('Energia Standard', 26.5, night_rate=15.0, standing_charge=43.5, pso_levy=11.3, source_url=url),
             self.create_tariff('Energia Fixed', 27.5, night_rate=15.5, standing_charge=43.5, pso_levy=11.3, discount={'percent': 10, 'months': 12}, source_url=url),
@@ -284,12 +284,12 @@ class PinergyScraper(BaseScraper):
 
 class EvokeEnergyScraper(BaseScraper):
     """Scraper for Evoke Energy."""
-    
+
     def __init__(self):
         super().__init__('Evoke Energy', 'https://www.evokeenergy.ie')
-    
+
     def scrape(self) -> List[Dict]:
-        url = 'https://www.evokeenergy.ie/electricity/'
+        url = 'https://www.evokeenergy.ie/'
         tariffs = [
             self.create_tariff('Evoke Basic', 27.0, night_rate=15.3, standing_charge=43.0, pso_levy=11.2, source_url=url),
             self.create_tariff('Evoke Plus', 25.8, night_rate=14.8, standing_charge=42.5, pso_levy=10.9, discount={'percent': 12, 'months': 12}, source_url=url),
