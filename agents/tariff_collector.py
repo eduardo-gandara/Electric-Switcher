@@ -10,6 +10,7 @@ import logging
 from typing import List, Dict, Tuple, Optional
 from datetime import datetime
 from dataclasses import dataclass, asdict
+from pathlib import Path
 
 # Import scrapers
 try:
@@ -22,6 +23,17 @@ except ImportError:
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Load providers configuration
+def load_providers_config() -> Dict:
+    """Load provider configuration from config/providers.json"""
+    config_path = Path(__file__).parent.parent / 'config' / 'providers.json'
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        logger.warning(f"Provider config not found at {config_path}")
+        return {"providers": []}
 
 
 @dataclass
@@ -58,39 +70,18 @@ class RejectedTariff:
 
 class TariffCollector:
     """Collects electricity tariffs from Irish providers."""
-    
-    # Official provider websites (only these are trusted sources)
-    OFFICIAL_PROVIDERS = {
-        'Bord Gáis Energy': [
-            'https://www.bordgais.ie/en/residential/electricity/',
-            'https://www.bordgais.ie/en/residential/electricity/electricity-plans/'
-        ],
-        'Electric Ireland': [
-            'https://www.electricireland.ie/ei/home/electricity/plans/',
-            'https://www.electricireland.ie/ei/home/electricity/'
-        ],
-        'SSE Airtricity': [
-            'https://www.sseairtricity.com/ie/home/electricity/',
-            'https://www.sseairtricity.com/ie/home/electricity/compare-plans/'
-        ],
-        'Energia': [
-            'https://www.energia.ie/residential/electricity/plans/',
-            'https://www.energia.ie/residential/electricity/'
-        ],
-        'Pinergy': [
-            'https://www.pinergy.ie/electricity-plans/',
-            'https://www.pinergy.ie/electricity/'
-        ],
-        'Evoke Energy': [
-            'https://www.evokeenergy.ie/electricity/',
-            'https://www.evokeenergy.ie/electricity-plans/'
-        ]
-    }
-    
+
     def __init__(self):
         self.collected_tariffs: List[CollectedTariff] = []
         self.rejected_tariffs: List[RejectedTariff] = []
         self.extraction_timestamp = datetime.now().isoformat()
+
+        # Load official providers from configuration
+        config = load_providers_config()
+        self.official_providers = {
+            p['name']: p['official_urls']
+            for p in config.get('providers', [])
+        }
     
     def collect_all(self) -> Tuple[List[CollectedTariff], List[RejectedTariff]]:
         """
@@ -224,13 +215,13 @@ class TariffCollector:
     def validate_source(self, url: str, supplier: str) -> bool:
         """
         Validate that a URL is an official provider website.
-        Rule: Solo se acepta un dato si procede de una página abierta 
+        Rule: Solo se acepta un dato si procede de una página abierta
         durante la sesión; un fragmento de buscador no es una fuente.
         """
-        if supplier not in self.OFFICIAL_PROVIDERS:
+        if supplier not in self.official_providers:
             return False
-        
-        official_urls = self.OFFICIAL_PROVIDERS[supplier]
+
+        official_urls = self.official_providers[supplier]
         return any(url.startswith(base) for base in official_urls)
     
     def extract_price_component(self, text: str, pattern: str) -> Optional[float]:
@@ -336,7 +327,7 @@ class TariffCollector:
         """Get a summary report of collection results."""
         return {
             'timestamp': self.extraction_timestamp,
-            'providers_scraped': len(self.OFFICIAL_PROVIDERS),
+            'providers_scraped': len(self.official_providers),
             'tariffs_collected': len(self.collected_tariffs),
             'tariffs_rejected': len(self.rejected_tariffs),
             'suppliers': list(set(t.supplier for t in self.collected_tariffs)),

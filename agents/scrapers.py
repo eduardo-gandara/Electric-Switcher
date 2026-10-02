@@ -7,8 +7,10 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import logging
+import json
 from typing import Optional, Dict, List
 from datetime import datetime
+from pathlib import Path
 
 # Optional Selenium imports (only needed for Pinergy SPA scraping)
 try:
@@ -24,6 +26,26 @@ except ImportError:
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def load_providers_config() -> Dict:
+    """Load provider configuration from config/providers.json"""
+    config_path = Path(__file__).parent.parent / 'config' / 'providers.json'
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        logger.warning(f"Provider config not found at {config_path}")
+        return {"providers": []}
+
+
+def get_provider_config(provider_name: str) -> Optional[Dict]:
+    """Get configuration for a specific provider"""
+    config = load_providers_config()
+    for provider in config.get('providers', []):
+        if provider['name'] == provider_name:
+            return provider
+    return None
 
 
 class BaseScraper:

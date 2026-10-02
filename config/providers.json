@@ -1,0 +1,47 @@
+{
+  "providers": [
+    {
+      "name": "Bord Gáis Energy",
+      "domain": "https://www.bordgais.ie",
+      "official_urls": [
+        "https://www.bordgais.ie/"
+      ]
+    },
+    {
+      "name": "Electric Ireland",
+      "domain": "https://www.electricireland.ie",
+      "official_urls": [
+        "https://www.electricireland.ie/"
+      ]
+    },
+    {
+      "name": "SSE Airtricity",
+      "domain": "https://www.sseairtricity.com",
+      "official_urls": [
+        "https://www.sseairtricity.com/"
+      ]
+    },
+    {
+      "name": "Energia",
+      "domain": "https://www.energia.ie",
+      "official_urls": [
+        "https://www.energia.ie/"
+      ]
+    },
+    {
+      "name": "Pinergy",
+      "domain": "https://pinergy.ie",
+      "official_urls": [
+        "https://pinergy.ie/tariffs-and-eab/",
+        "https://pinergy.ie/"
+      ]
+    },
+    {
+      "name": "Evoke Energy",
+      "domain": "https://www.evokeenergy.ie",
+      "official_urls": [
+        "https://www.evokeenergy.ie/"
+      ]
+    }
+  ]
+}

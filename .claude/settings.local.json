@@ -44,7 +44,9 @@
       "Bash(git commit -m 'fix: make Selenium optional and provide fallback data for Pinergy *)",
       "Bash(pkill -f \"app.py\")",
       "Bash(pkill -f app.py)",
-      "Bash(git commit -m 'Improve tariff rate display in modal details *)"
+      "Bash(git commit -m 'Improve tariff rate display in modal details *)",
+      "Bash(git commit -m 'Fix provider URLs to point to valid official domains *)",
+      "Bash(git commit -m 'Centralize provider configuration in JSON *)"
     ]
   }
 }
