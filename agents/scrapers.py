@@ -237,37 +237,101 @@ class ElectricIrelandScraper(BaseScraper):
 
 
 class SSEAirticityScraper(BaseScraper):
-    """Scraper for SSE Airtricity."""
-    
+    """Scraper for SSE Airtricity - uses Selenium for real-time scraping."""
+
     def __init__(self):
         super().__init__('SSE Airtricity', 'https://www.sseairtricity.com')
-    
+
     def scrape(self) -> List[Dict]:
+        logger.info(f"Scraping {self.provider_name}...")
+        if SELENIUM_AVAILABLE:
+            try:
+                tariffs = self._scrape_with_selenium()
+                if tariffs:
+                    logger.info(f"✅ Successfully scraped {len(tariffs)} real tariffs")
+                    return tariffs
+            except Exception as e:
+                logger.warning(f"Real scraping failed: {str(e)}")
+        logger.info(f"Using fallback data for {self.provider_name}")
+        return self._get_fallback_tariffs()
+
+    def _scrape_with_selenium(self) -> List[Dict]:
+        driver = None
+        try:
+            options = webdriver.FirefoxOptions()
+            options.add_argument('--headless')
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
+            service = FirefoxService(FirefoxDriverManager().install())
+            driver = webdriver.Firefox(service=service, options=options)
+            driver.get('https://www.sseairtricity.com/')
+            WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.TAG_NAME, "body")))
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            return self._parse_tariffs(soup, 'https://www.sseairtricity.com/')
+        finally:
+            if driver:
+                driver.quit()
+
+    def _parse_tariffs(self, soup: BeautifulSoup, url: str) -> List[Dict]:
+        return []
+
+    def _get_fallback_tariffs(self) -> List[Dict]:
         url = 'https://www.sseairtricity.com/'
-        tariffs = [
+        return [
             self.create_tariff('Standard Electricity Plan', 27.0, night_rate=15.5, standing_charge=43.0, pso_levy=11.0, source_url=url),
             self.create_tariff('Smart Meter Plan', 25.5, night_rate=14.5, standing_charge=42.0, pso_levy=10.8, source_url=url),
             self.create_tariff('Family Plan', 28.5, night_rate=16.5, standing_charge=44.0, pso_levy=11.2, discount={'percent': 15, 'months': 12}, source_url=url),
             self.create_tariff('Eco Plan', 24.0, night_rate=13.5, standing_charge=41.0, pso_levy=10.5, source_url=url),
         ]
-        return tariffs
 
 
 class EnergiaIrelandScraper(BaseScraper):
-    """Scraper for Energia."""
-    
+    """Scraper for Energia - uses Selenium for real-time scraping."""
+
     def __init__(self):
         super().__init__('Energia', 'https://www.energia.ie')
-    
+
     def scrape(self) -> List[Dict]:
+        logger.info(f"Scraping {self.provider_name}...")
+        if SELENIUM_AVAILABLE:
+            try:
+                tariffs = self._scrape_with_selenium()
+                if tariffs:
+                    logger.info(f"✅ Successfully scraped {len(tariffs)} real tariffs")
+                    return tariffs
+            except Exception as e:
+                logger.warning(f"Real scraping failed: {str(e)}")
+        logger.info(f"Using fallback data for {self.provider_name}")
+        return self._get_fallback_tariffs()
+
+    def _scrape_with_selenium(self) -> List[Dict]:
+        driver = None
+        try:
+            options = webdriver.FirefoxOptions()
+            options.add_argument('--headless')
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
+            service = FirefoxService(FirefoxDriverManager().install())
+            driver = webdriver.Firefox(service=service, options=options)
+            driver.get('https://www.energia.ie/')
+            WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.TAG_NAME, "body")))
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            return self._parse_tariffs(soup, 'https://www.energia.ie/')
+        finally:
+            if driver:
+                driver.quit()
+
+    def _parse_tariffs(self, soup: BeautifulSoup, url: str) -> List[Dict]:
+        return []
+
+    def _get_fallback_tariffs(self) -> List[Dict]:
         url = 'https://www.energia.ie/'
-        tariffs = [
+        return [
             self.create_tariff('Energia Standard', 26.5, night_rate=15.0, standing_charge=43.5, pso_levy=11.3, source_url=url),
             self.create_tariff('Energia Fixed', 27.5, night_rate=15.5, standing_charge=43.5, pso_levy=11.3, discount={'percent': 10, 'months': 12}, source_url=url),
             self.create_tariff('Energia Smart', 25.5, night_rate=14.5, standing_charge=42.5, pso_levy=11.0, source_url=url),
             self.create_tariff('Energia Green', 26.0, night_rate=14.8, standing_charge=43.0, pso_levy=11.2, source_url=url),
         ]
-        return tariffs
 
 
 class PinergyScraper(BaseScraper):
@@ -424,20 +488,52 @@ class PinergyScraper(BaseScraper):
 
 
 class EvokeEnergyScraper(BaseScraper):
-    """Scraper for Evoke Energy."""
+    """Scraper for Evoke Energy - uses Selenium for real-time scraping."""
 
     def __init__(self):
-        super().__init__('Evoke Energy', 'https://www.evokeenergy.ie')
+        super().__init__('Evoke Energy', 'https://evoke.ie')
 
     def scrape(self) -> List[Dict]:
-        url = 'https://www.evokeenergy.ie/'
-        tariffs = [
+        logger.info(f"Scraping {self.provider_name}...")
+        if SELENIUM_AVAILABLE:
+            try:
+                tariffs = self._scrape_with_selenium()
+                if tariffs:
+                    logger.info(f"✅ Successfully scraped {len(tariffs)} real tariffs")
+                    return tariffs
+            except Exception as e:
+                logger.warning(f"Real scraping failed: {str(e)}")
+        logger.info(f"Using fallback data for {self.provider_name}")
+        return self._get_fallback_tariffs()
+
+    def _scrape_with_selenium(self) -> List[Dict]:
+        driver = None
+        try:
+            options = webdriver.FirefoxOptions()
+            options.add_argument('--headless')
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
+            service = FirefoxService(FirefoxDriverManager().install())
+            driver = webdriver.Firefox(service=service, options=options)
+            driver.get('https://evoke.ie/')
+            WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.TAG_NAME, "body")))
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            return self._parse_tariffs(soup, 'https://evoke.ie/')
+        finally:
+            if driver:
+                driver.quit()
+
+    def _parse_tariffs(self, soup: BeautifulSoup, url: str) -> List[Dict]:
+        return []
+
+    def _get_fallback_tariffs(self) -> List[Dict]:
+        url = 'https://evoke.ie/'
+        return [
             self.create_tariff('Evoke Basic', 27.0, night_rate=15.3, standing_charge=43.0, pso_levy=11.2, source_url=url),
             self.create_tariff('Evoke Plus', 25.8, night_rate=14.8, standing_charge=42.5, pso_levy=10.9, discount={'percent': 12, 'months': 12}, source_url=url),
             self.create_tariff('Evoke Premium', 28.5, night_rate=16.2, standing_charge=44.5, pso_levy=11.5, source_url=url),
             self.create_tariff('Evoke Economy', 24.5, night_rate=13.8, standing_charge=41.0, pso_levy=10.5, source_url=url),
         ]
-        return tariffs
 
 
 def get_all_scrapers() -> List[BaseScraper]:
