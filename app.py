@@ -19,6 +19,7 @@ from src.simulation_engine import SimulationEngine, ConsumptionProfile, TariffRe
 from src.consumption_processor import ConsumptionProcessor
 from agents.advisor import AdvisorAgent
 from agents.tariff_collector import TariffCollector
+from agents.advisor_analyzer import SensitivityAnalyzer, RiskAnalyzer, AdvisorRecommender
 
 # Custom JSON encoder for numpy types
 class NumpyEncoder(json.JSONEncoder):
@@ -354,6 +355,91 @@ def collect_tariffs():
             'tariffs': collected_dicts,
             'rejected': rejected_dicts,
             'exported_to': output_file
+        })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/analyze-tariffs', methods=['POST'])
+def analyze_tariffs():
+    """
+    Phase 3: Análisis de sensibilidad, riesgos y recomendaciones.
+    Recibe tarifas con costos mensuales y devuelve:
+    - Sensibilidad a consumo (±20%)
+    - Análisis de riesgos
+    - Ranking ordenado
+    - Recomendación personalizada
+    """
+    try:
+        data = request.get_json() or {}
+
+        # Esperamos: {"tariffs": [...], "consumption_kwh": float}
+        tariffs_data = data.get('tariffs', [])
+        consumption_kwh = data.get('consumption_kwh', 3000)  # Default anual
+
+        if not tariffs_data:
+            return jsonify({'success': False, 'error': 'No tariffs provided'}), 400
+
+        # Inicializar analizadores
+        sensitivity = SensitivityAnalyzer(consumption_kwh)
+        risk_analyzer = RiskAnalyzer()
+        recommender = AdvisorRecommender()
+
+        # Procesar cada tarifa
+        tariffs_with_analysis = []
+
+        for tariff_data in tariffs_data:
+            tariff = TariffRecord.from_dict(tariff_data) if isinstance(tariff_data, dict) else tariff_data
+
+            # Monthly costs (asumimos 24 meses)
+            monthly_costs = tariff_data.get('monthly_costs', [])
+            if not monthly_costs:
+                # Fallback: calcular costo anual / 12
+                annual = tariff_data.get('annual_cost', 1200)
+                monthly_costs = [annual / 12] * 12
+
+            # Análisis de sensibilidad
+            sensitivity_costs = sensitivity.scale_monthly_costs(monthly_costs)
+            sensitivity_summary = sensitivity.get_sensitivity_summary(sensitivity_costs)
+
+            # Análisis de riesgos
+            risks = risk_analyzer.analyze_tariff_risks(tariff_data)
+
+            # Compilar resultado
+            tariffs_with_analysis.append({
+                'tariff': tariff_data,
+                'annual_cost': tariff_data.get('annual_cost', sum(monthly_costs)),
+                'monthly_costs': monthly_costs,
+                'sensitivity': sensitivity_summary,
+                'sensitivity_detailed': sensitivity_costs,
+                'risks': risks
+            })
+
+        # Ranking
+        ranked = recommender.rank_tariffs(tariffs_with_analysis)
+
+        # Recomendación
+        recommendation = recommender.get_recommendation(ranked)
+
+        # Convertir a JSON-serializable
+        ranked_serialized = []
+        for item in ranked:
+            item_copy = convert_numpy_types(item)
+            ranked_serialized.append(item_copy)
+
+        recommendation = convert_numpy_types(recommendation)
+
+        return jsonify({
+            'success': True,
+            'analysis': {
+                'ranking': ranked_serialized,
+                'recommendation': recommendation,
+                'total_tariffs': len(ranked),
+                'consumption_kwh': consumption_kwh
+            }
         })
 
     except Exception as e:

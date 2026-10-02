@@ -569,6 +569,9 @@
                 if (data.success) {
                     displayResults(data.results, data.report);
                     showSection('resultsSection');
+
+                    // Phase 3: Trigger advisor analysis
+                    await analyzeCollectedTariffs(selected);
                 } else {
                     alert('Error: ' + (data.error || 'Unknown error'));
                 }
@@ -579,6 +582,176 @@
         }
 
         window.comparisonResults = [];
+        window.advisorAnalysis = null;
+
+        // Phase 3: Analyze tariffs for ranking, sensitivity, and recommendations
+        async function analyzeCollectedTariffs(tariffs) {
+            try {
+                const consumptionKwh = state.totalConsumption || 3000;
+
+                const response = await fetch('/api/analyze-tariffs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tariffs: tariffs,
+                        consumption_kwh: consumptionKwh
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    window.advisorAnalysis = data.analysis;
+                    displayAdvisorAnalysis(data.analysis);
+                } else {
+                    console.warn('Analysis failed:', data.error);
+                }
+            } catch (e) {
+                console.error('Error analyzing tariffs:', e);
+            }
+        }
+
+        function displayAdvisorAnalysis(analysis) {
+            const { ranking, recommendation } = analysis;
+
+            let html = `
+            <div style="margin-top: 30px; border-top: 2px solid var(--gray-200); padding-top: 30px;">
+                <h2 style="color: var(--primary); margin-bottom: 20px;">📊 Ranking y Análisis (Fase 3)</h2>
+
+                <div style="background: linear-gradient(135deg, var(--success) 0%, #10b981 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 30px;">
+                    <h3 style="margin: 0 0 10px 0; font-size: 1.3em;">✨ Recomendación</h3>
+                    <p style="margin: 10px 0; font-size: 1.1em; font-weight: bold;">${recommendation.tariff_name}</p>
+                    <p style="margin: 10px 0; font-size: 0.95em; opacity: 0.95;">${recommendation.supplier}</p>
+                    <p style="margin: 15px 0 0 0; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 15px; font-size: 1.6em; font-weight: bold;">€${recommendation.annual_cost.toFixed(2)}/año</p>
+                    <p style="margin: 10px 0 0 0; font-size: 0.9em; line-height: 1.6;">${recommendation.text}</p>
+                </div>
+
+                <h3 style="color: var(--primary); margin-bottom: 15px;">🏆 Ranking de Tarifas</h3>
+                <div style="display: grid; gap: 15px;">
+            `;
+
+            ranking.forEach((item, idx) => {
+                const tariff = item.tariff;
+                const sensitivity = item.sensitivity;
+                const risks = item.risks;
+                const isBest = idx === 0;
+
+                html += `
+                    <div style="background: white; border: 2px solid ${isBest ? 'var(--success)' : 'var(--gray-200)'}; padding: 20px; border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                            <div>
+                                <div style="display: inline-block; background: ${isBest ? 'var(--success)' : 'var(--gray-300)'}; color: ${isBest ? 'white' : 'var(--gray-700)'}; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85em; margin-bottom: 10px;">#${item.rank}</div>
+                                <h4 style="margin: 0 0 5px 0; color: var(--primary);">${tariff.plan_name}</h4>
+                                <p style="margin: 0; color: var(--gray-700); font-size: 0.9em;">${tariff.supplier}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 1.6em; font-weight: bold; color: var(--primary);">€${item.annual_cost.toFixed(2)}</div>
+                                <div style="font-size: 0.85em; color: var(--gray-700);">/año</div>
+                            </div>
+                        </div>
+
+                        ${item.annual_savings > 0 ? `
+                            <div style="background: #d1fae5; padding: 10px; border-radius: 6px; color: #065f46; margin-bottom: 15px; font-weight: 500; font-size: 0.9em;">
+                                💰 Ahorra €${item.annual_savings.toFixed(2)} (${item.savings_percent}%)
+                            </div>
+                        ` : ''}
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--gray-200);">
+                            <div>
+                                <p style="margin: 0 0 8px 0; font-size: 0.85em; color: var(--gray-600); font-weight: 600;">Sensibilidad</p>
+                                <p style="margin: 0; font-size: 0.9em;">
+                                    -20%: €${sensitivity.low_20_annual.toFixed(0)}<br>
+                                    Base: €${sensitivity.base_annual.toFixed(0)}<br>
+                                    +20%: €${sensitivity.high_20_annual.toFixed(0)}
+                                </p>
+                                <p style="margin: 8px 0 0 0; font-size: 0.8em; color: var(--gray-600);">Rango: €${sensitivity.variance.toFixed(0)}</p>
+                            </div>
+                            <div>
+                                <p style="margin: 0 0 8px 0; font-size: 0.85em; color: var(--gray-600); font-weight: 600;">Riesgos (${risks.count})</p>
+                                <p style="margin: 0; font-size: 0.9em;">
+                                    ${risks.risks.length === 0 ? '✅ Sin riesgos' : risks.risks.map(r => `${r.icon} ${r.title}`).join('<br>')}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; font-size: 0.9em;">
+                            <button onclick="showAdvisorDetails(${idx})" style="flex: 1; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                                📋 Ver detalles
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                </div>
+            </div>
+            `;
+
+            const section = document.getElementById('resultsSection');
+            const existingAnalysis = section.querySelector('[data-advisor-analysis]');
+            if (existingAnalysis) existingAnalysis.remove();
+
+            const div = document.createElement('div');
+            div.setAttribute('data-advisor-analysis', 'true');
+            div.innerHTML = html;
+            section.appendChild(div);
+        }
+
+        function showAdvisorDetails(rankIndex) {
+            const analysis = window.advisorAnalysis;
+            if (!analysis || !analysis.ranking[rankIndex]) return;
+
+            const item = analysis.ranking[rankIndex];
+            const tariff = item.tariff;
+            const risks = item.risks;
+
+            let riskHtml = '';
+            if (risks.risks.length > 0) {
+                riskHtml = '<h4 style="margin: 15px 0 10px 0; color: var(--primary);">⚠️ Riesgos identificados:</h4>';
+                risks.risks.forEach(r => {
+                    riskHtml += `
+                        <div style="background: var(--gray-50); padding: 12px; border-left: 4px solid var(--warning); margin-bottom: 10px; border-radius: 4px;">
+                            <p style="margin: 0 0 5px 0; font-weight: 600; font-size: 0.95em;">${r.icon} ${r.title}</p>
+                            <p style="margin: 0; font-size: 0.9em; color: var(--gray-700);">${r.description}</p>
+                        </div>
+                    `;
+                });
+            }
+
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; overflow-y: auto;';
+            modal.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%; margin: 20px; max-height: 90vh; overflow-y: auto;">
+                    <button onclick="this.closest('div').parentElement.remove()" style="float: right; background: none; border: none; font-size: 1.8em; cursor: pointer; color: var(--gray-500);">×</button>
+                    <h2 style="margin-top: 0; color: var(--primary);">${tariff.plan_name}</h2>
+                    <p style="color: var(--gray-700); margin: 10px 0 20px 0; font-size: 1.1em;">${tariff.supplier}</p>
+
+                    <div style="background: var(--gray-50); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <p style="margin: 0; font-size: 0.9em; color: var(--gray-700);">Costo anual</p>
+                        <p style="margin: 5px 0 0 0; font-size: 1.8em; font-weight: bold; color: var(--primary);">€${item.annual_cost.toFixed(2)}</p>
+                    </div>
+
+                    <h4 style="color: var(--primary); margin-bottom: 10px;">📈 Sensibilidad a consumo</h4>
+                    <p style="margin: 0 0 15px 0; font-size: 0.9em;">
+                        Costo si tu consumo cambia:<br>
+                        <strong>-20%:</strong> €${item.sensitivity.low_20_annual.toFixed(2)}<br>
+                        <strong>Base:</strong> €${item.sensitivity.base_annual.toFixed(2)}<br>
+                        <strong>+20%:</strong> €${item.sensitivity.high_20_annual.toFixed(2)}<br>
+                        <strong style="color: var(--warning);">Rango:</strong> €${item.sensitivity.variance.toFixed(2)}
+                    </p>
+
+                    ${riskHtml}
+
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--gray-200);">
+                        <a href="${tariff.source_url}" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 500;">🔗 Ver en sitio oficial</a>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.onclick = (e) => {
+                if (e.target === modal) modal.remove();
+            };
+        }
 
         function displayResults(results, report) {
             window.comparisonResults = results;

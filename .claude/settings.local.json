@@ -46,7 +46,21 @@
       "Bash(pkill -f app.py)",
       "Bash(git commit -m 'Improve tariff rate display in modal details *)",
       "Bash(git commit -m 'Fix provider URLs to point to valid official domains *)",
-      "Bash(git commit -m 'Centralize provider configuration in JSON *)"
+      "Bash(git commit -m 'Centralize provider configuration in JSON *)",
+      "Bash(git commit -m 'Add URL accessibility status and data source tracking *)",
+      "Bash(git commit -m 'Update provider URLs with working alternatives *)",
+      "Bash(git commit -m 'WIP: Add real web scraping with Selenium to scrapers *)",
+      "Bash(python3 -c \"import selenium; print\\('✅ Selenium installed:', selenium.__version__\\)\")",
+      "Bash(curl -s -X POST http://localhost:5000/api/collect-tariffs -H 'Content-Type: application/json' -d '{\"method\": \"llm\"}')",
+      "Bash(sed -i '655s/viewBox=\"0 0 100 350\"/viewBox=\"0 0 100 310\"/' ~/Projects/Electric-Switcher/templates/index.html)",
+      "Bash(sed -i '655s/height: 380px/height: 420px/' ~/Projects/Electric-Switcher/templates/index.html)",
+      "Bash(sed -i '656s/y=\"${chartHeight}\"/y=\"240\"/' ~/Projects/Electric-Switcher/templates/index.html)",
+      "Bash(sed -i '656s/y2=\"${chartHeight}\"/y2=\"240\"/' ~/Projects/Electric-Switcher/templates/index.html)",
+      "Bash(sed -i '655s/height: 420px/height: 400px/' ~/Projects/Electric-Switcher/templates/index.html)",
+      "Bash(sed -i '655s/viewBox=\"0 0 100 310\"/viewBox=\"0 0 100 300\"/' ~/Projects/Electric-Switcher/templates/index.html)",
+      "Bash(sed -i '656s/y=\"20\"/y=\"18\"/' ~/Projects/Electric-Switcher/templates/index.html)",
+      "Bash(sed -i '656s/y2=\"240\"/y2=\"${chartHeight}\"/' ~/Projects/Electric-Switcher/templates/index.html)",
+      "Bash(sed -i '656s/stroke-width=\"1.5\"/stroke-width=\"1\"/' ~/Projects/Electric-Switcher/templates/index.html)"
     ]
   }
 }
