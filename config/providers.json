@@ -2,9 +2,10 @@
   "providers": [
     {
       "name": "Bord Gáis Energy",
-      "domain": "https://www.bordgais.ie",
-      "official_urls": ["https://www.bordgais.ie/"],
-      "status": "BLOCKED - SSL connection error",
+      "domain": "http://www.bordgais.ie",
+      "official_urls": ["http://www.bordgais.ie/", "http://bordgais.ie/"],
+      "status": "✅ ACCESSIBLE via HTTP (200)",
+      "note": "HTTPS blocked - using HTTP",
       "data_source": "fallback_verified"
     },
     {
@@ -30,16 +31,16 @@
     },
     {
       "name": "Pinergy",
-      "domain": "https://pinergy.ie",
-      "official_urls": ["https://pinergy.ie/tariffs-and-eab/", "https://pinergy.ie/"],
-      "status": "BLOCKED - 403 Forbidden (anti-scraping)",
+      "domain": "https://www.pinergy.ie",
+      "official_urls": ["https://www.pinergy.ie/", "https://www.pinergy.ie/tariffs-and-eab/"],
+      "status": "✅ ACCESSIBLE (200) - www subdomain works",
       "data_source": "fallback_verified"
     },
     {
       "name": "Evoke Energy",
-      "domain": "https://www.evokeenergy.ie",
-      "official_urls": ["https://www.evokeenergy.ie/"],
-      "status": "BLOCKED - Connection error",
+      "domain": "https://evoke.ie",
+      "official_urls": ["https://evoke.ie/", "https://www.evoke.ie/", "http://evoke.ie/"],
+      "status": "✅ ACCESSIBLE (200) - evoke.ie domain works",
       "data_source": "fallback_verified"
     }
   ]
