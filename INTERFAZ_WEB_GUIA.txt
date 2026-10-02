@@ -1,0 +1,395 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║               🌐 INTERFAZ WEB DE ELECTRIC SWITCHER 🌐                          ║
+║            Guía Completa para Usar la Aplicación Web                          ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════════
+🚀 INICIO RÁPIDO (3 PASOS)
+═══════════════════════════════════════════════════════════════════════════════
+
+PASO 1: Abre una terminal en el directorio del proyecto
+$ cd /home/gandara/Projects/Electric-Switcher
+
+PASO 2: Ejecuta el servidor web
+$ source venv/bin/activate
+$ python3 app.py
+
+PASO 3: Abre tu navegador
+→ http://localhost:5000
+
+¡Listo! La interfaz cargará automáticamente.
+
+═══════════════════════════════════════════════════════════════════════════════
+📱 INTERFAZ WEB - COMPONENTES
+═══════════════════════════════════════════════════════════════════════════════
+
+HEADER (Superior)
+┌─────────────────────────────────────────────────────────────────┐
+│  ⚡ Electric Switcher                                           │
+│  Simulador de Tarifas Eléctricas de Irlanda                    │
+│  Calcula cuánto pagarías con cada tarifa y decide si cambiar   │
+└─────────────────────────────────────────────────────────────────┘
+
+CONTENIDO PRINCIPAL (2 COLUMNAS)
+┌─────────────────────────────────┬─────────────────────────────────┐
+│  PANEL IZQUIERDO                │  PANEL DERECHO                  │
+│  📋 CONFIGURACIÓN               │  📊 RESULTADOS                  │
+│                                 │                                 │
+│ ✓ Modo (Demo / Mis datos)      │ Pestañas:                       │
+│ ✓ Upload CSV (si aplica)        │  • 📊 Ranking                   │
+│ ✓ Seleccionar tarifas           │  • 📈 Análisis                  │
+│ ✓ Rango de fechas               │  • ℹ️  Detalles                 │
+│                                 │                                 │
+│ [⚡ Ejecutar Simulación]        │ Muestra TOP 3 tarifas           │
+│ [🔄 Limpiar]                    │ con costos y ahorros            │
+└─────────────────────────────────┴─────────────────────────────────┘
+
+MÉTRICAS (Inferior, aparece tras simular)
+┌──────────────┬──────────────┬──────────────┬──────────────┐
+│ Consumo      │ Período      │ Mejor Tarifa │ Ahorro Máx   │
+│ 1096 kWh     │ 4 meses      │ €269,80      │ €128,37      │
+└──────────────┴──────────────┴──────────────┴──────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+🎯 MODO DEMOSTRACIÓN (Recomendado para Probar)
+═══════════════════════════════════════════════════════════════════════════════
+
+FLUJO:
+1. Selecciona "📊 Demostración" (ya está seleccionado)
+2. Las tarifas Bord Gáis + Electric Ireland se seleccionan automáticamente
+3. Las fechas están preconfiguradas (junio-septiembre 2026)
+4. Haz clic en "⚡ Ejecutar Simulación"
+5. Espera 2-3 segundos mientras se procesa
+6. Ve los resultados en las 3 pestañas
+
+RESULTADO ESPERADO:
+
+TOP 1: Electric Ireland - Smart Day & Night
+       Coste: 269,80€/año
+       Consumo: 1096 kWh
+
+TOP 2: Bord Gáis - Smart All Day
+       Coste: 398,17€/año
+       Consumo: 1096 kWh
+       Ahorro: €128,37
+
+TOP 3: (Si hay más tarifas)
+
+ANÁLISIS:
+├─ Supuestos (período, consumo, tarifa actual)
+├─ Riesgos (descuentos, penalizaciones)
+└─ Recomendaciones (próximos pasos)
+
+═══════════════════════════════════════════════════════════════════════════════
+📁 MODO CON TUS DATOS
+═══════════════════════════════════════════════════════════════════════════════
+
+PASO 1: Selecciona "📁 Mis datos"
+→ Aparecerá sección de upload de CSV
+
+PASO 2: Obtén tu CSV de ESB Networks
+→ Ve a https://www.esbnetworks.ie/
+→ Login a tu cuenta
+→ Descarga "Datos de consumo"
+→ Formato: CSV con columnas:
+   • MPRN, Meter Serial Number
+   • Read Value (kWh)
+   • Read Type (Normal/Estimated)
+   • Read Date and End Time
+
+PASO 3: Sube el archivo
+→ Haz clic en "📤 Selecciona tu archivo CSV"
+→ Elige el archivo descargado
+→ Espera: "✓ Datos válidos"
+
+PASO 4: Selecciona tarifas
+→ Marca las que quieras comparar
+→ Mínimo 1, máximo todas
+
+PASO 5: Ajusta fechas si es necesario
+→ Mes inicio: Cuando empieza tu período
+→ Mes fin: Cuando termina
+
+PASO 6: Ejecuta
+→ Haz clic en "⚡ Ejecutar Simulación"
+→ El motor procesa tu CSV + tarifas
+→ Calcula costos reales
+→ Genera ranking personalizado
+
+═══════════════════════════════════════════════════════════════════════════════
+🎨 DISEÑO Y COLORES
+═══════════════════════════════════════════════════════════════════════════════
+
+PALETA:
+┌─────────────────────────────────────────────────────────────┐
+│ Morado Gradiente  ← Fondo de la página                      │
+│ Azul (#2563eb)    ← Botones, enlaces, títulos               │
+│ Verde (#10b981)   ← Éxito, datos válidos                    │
+│ Naranja (#f59e0b) ← Advertencias, riesgos                   │
+│ Rojo (#ef4444)    ← Errores                                 │
+│ Blanco/Gris       ← Fondo de cards y texto                  │
+└─────────────────────────────────────────────────────────────┘
+
+ANIMACIONES:
+✓ Botones se elevan al pasar el mouse
+✓ Loading spinner durante procesamiento
+✓ Cambios suaves entre pestañas
+✓ Cards con sombra y transiciones
+
+═══════════════════════════════════════════════════════════════════════════════
+📊 LAS 3 PESTAÑAS DE RESULTADOS
+═══════════════════════════════════════════════════════════════════════════════
+
+PESTAÑA 1: 📊 RANKING
+┌─────────────────────────────────────────────────────────────┐
+│ #1 Electric Ireland - Smart Day & Night        [ORO]        │
+│    Coste: 269,80€/año                                       │
+│    Consumo: 1.096 kWh                                       │
+│    💰 Ahorro: 128,37€ vs tarifas más caras                  │
+│                                                             │
+│ #2 Bord Gáis - Smart All Day          [PLATA]              │
+│    Coste: 398,17€/año                                       │
+│    Consumo: 1.096 kWh                                       │
+│    (sin ahorro respecto a sí misma)                         │
+│                                                             │
+│ #3 [Tercera opción si existe]         [BRONCE]             │
+└─────────────────────────────────────────────────────────────┘
+
+PESTAÑA 2: 📈 ANÁLISIS
+┌─────────────────────────────────────────────────────────────┐
+│ 📋 SUPUESTOS                                                │
+│ • Período: 2026-06 a 2026-09                                │
+│ • Consumo: 1.096 kWh                                        │
+│ • Tarifa actual: Electric Ireland                           │
+│ • Coste actual: 269,80€                                     │
+│                                                             │
+│ ⚠️ RIESGOS                                                  │
+│ • Descuento del 32% solo el primer año                      │
+│ • Penalización de salida: 0€                                │
+│                                                             │
+│ 💡 RECOMENDACIONES                                          │
+│ ✓ La tarifa actual es competitiva                           │
+│ ✓ Verifica en web oficial antes de decidir                  │
+│ ✓ Si tu hogar cambia (EV, bomba), recalcula                │
+└─────────────────────────────────────────────────────────────┘
+
+PESTAÑA 3: ℹ️ DETALLES
+┌─────────────────────────────────────────────────────────────┐
+│ JSON COMPLETO DE RESULTADOS                                 │
+│                                                             │
+│ {                                                           │
+│   "supplier": "Electric Ireland",                           │
+│   "plan_name": "Smart Day & Night (sample)",                │
+│   "total_cost_eur": 269.80,                                 │
+│   "total_consumption_kwh": 1096,                            │
+│   "monthly_breakdown": [...],                               │
+│   ...                                                       │
+│ }                                                           │
+│                                                             │
+│ Para desarrolladores / análisis avanzado                    │
+└─────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+🔧 BOTONES Y ACCIONES
+═══════════════════════════════════════════════════════════════════════════════
+
+BOTONES PRINCIPALES:
+┌──────────────────────────────────────────────────────────────┐
+│ [⚡ Ejecutar Simulación]                                     │
+│  • Color: Azul gradiente                                     │
+│  • Función: Inicia cálculos                                  │
+│  • Deshabilitado si: No hay tarifas seleccionadas            │
+│                                                              │
+│ [🔄 Limpiar]                                                │
+│  • Color: Gris                                               │
+│  • Función: Limpia formulario y resultados                   │
+│  • Recarga la página completamente                           │
+└──────────────────────────────────────────────────────────────┘
+
+OTROS CONTROLES:
+┌──────────────────────────────────────────────────────────────┐
+│ [📤 Selecciona tu archivo CSV]   (Solo en modo "Mis datos")  │
+│  → Abre diálogo de selección de archivos                     │
+│  → Solo acepta .csv                                          │
+│                                                              │
+│ [✓ Checkbox Tarifas]                                         │
+│  → Marca/desmarca cada tarifa                                │
+│  → Mínimo 1, máximo todas                                    │
+│                                                              │
+│ [📅 Fecha Inicio/Fin]                                        │
+│  → Selector de fecha (YYYY-MM-DD)                            │
+│  → Formatos: junio-09 a 2026-09-30                           │
+│                                                              │
+│ [📊 Ranking] [📈 Análisis] [ℹ️ Detalles]                     │
+│  → Tabs para cambiar entre vistas                            │
+└──────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+💬 MENSAJES Y ESTADOS
+═══════════════════════════════════════════════════════════════════════════════
+
+INFORMACIÓN (Azul):
+✓ "Cargando tarifas..."
+✓ "Procesando CSV..."
+
+ÉXITO (Verde):
+✓ "✓ CSV válido"
+✓ "✓ Simulación completada"
+
+ADVERTENCIA (Naranja):
+⚠ "Datos de hace 7 días, verifica en web oficial"
+⚠ "Descuento solo el primer año"
+
+ERROR (Rojo):
+✗ "Error: No file provided"
+✗ "CSV file not found"
+✗ "Selecciona al menos una tarifa"
+
+═══════════════════════════════════════════════════════════════════════════════
+🐛 SOLUCIÓN DE PROBLEMAS
+═══════════════════════════════════════════════════════════════════════════════
+
+PROBLEMA: Interfaz no carga
+SOLUCIÓN:
+1. Comprueba que el servidor está corriendo
+   → Terminal debería mostrar "Running on http://127.0.0.1:5000"
+2. Abre en navegador: http://localhost:5000 (no https)
+3. Limpia caché: Ctrl+Shift+Delete
+4. Intenta incógnito: Ctrl+Shift+N
+
+PROBLEMA: "Cannot POST /api/demo-simulate"
+SOLUCIÓN:
+1. Reinicia el servidor: Ctrl+C y vuelve a ejecutar
+2. Comprueba que Flask está activo en terminal
+3. Abre consola del navegador (F12 → Console)
+4. Mira qué error reporta exactamente
+
+PROBLEMA: CSV no se procesa
+SOLUCIÓN:
+1. Verifica que sea formato CSV (no Excel)
+2. Columnas deben ser exactamente:
+   ✓ MPRN, Meter Serial Number
+   ✓ Read Value
+   ✓ Read Type
+   ✓ Read Date and End Time
+3. Dates en formato: dd-mm-yyyy hh:mm
+4. Tamaño < 16 MB
+
+PROBLEMA: Puerto 5000 ocupado
+SOLUCIÓN:
+$ lsof -i :5000          # Ver qué ocupa el puerto
+$ kill -9 <PID>         # Matar ese proceso
+O usar otro puerto:
+$ export FLASK_PORT=5001 && python3 app.py
+Luego: http://localhost:5001
+
+═══════════════════════════════════════════════════════════════════════════════
+📊 EJEMPLO DE USO PASO A PASO
+═══════════════════════════════════════════════════════════════════════════════
+
+USUARIO: Quiero saber cuánto ahorraría cambiando de Bord Gáis a Electric Ireland
+
+1. Abre http://localhost:5000
+
+2. Ve que ya está seleccionado "Demostración"
+
+3. Tarifas disponibles aparecen:
+   ☑ Bord Gáis - Smart All Day (SELECCIONADA)
+   ☑ Electric Ireland - Smart Day & Night (SELECCIONADA)
+
+4. Fechas: junio-septiembre 2026 (OK)
+
+5. Haz clic en "⚡ Ejecutar Simulación"
+
+6. Espera 3 segundos (spinner de carga)
+
+7. Aparecen resultados en panel derecho:
+
+   RANKING:
+   #1: Electric Ireland - 269,80€/año  💰 AHORRO: €128,37
+   #2: Bord Gáis - 398,17€/año
+
+8. CONCLUSIÓN: Cambiar a Electric Ireland ahorra 128,37€ anuales
+
+9. Para verificar: Haz clic en URL de la tarifa
+   → Va a https://www.electricireland.ie/
+
+═══════════════════════════════════════════════════════════════════════════════
+🎓 INFORMACIÓN TÉCNICA
+═══════════════════════════════════════════════════════════════════════════════
+
+ARQUITECTURA:
+┌─────────────────────────────────────────────────────────────┐
+│ FRONTEND (Navegador)                                        │
+│ • HTML5 + CSS3 (sin frameworks)                              │
+│ • Vanilla JavaScript (sin jQuery, React, Vue)                │
+│ • Fetch API para comunicación con backend                    │
+│ • Responsive design (funciona en móvil, tablet, desktop)     │
+│                                                             │
+│ ↕ COMUNICACIÓN (HTTP/JSON)                                  │
+│                                                             │
+│ BACKEND (Flask)                                             │
+│ • Python 3.8+                                               │
+│ • Flask web framework                                       │
+│ • CORS habilitado (cross-origin requests)                    │
+│ • Endpoints REST:                                           │
+│   GET  /api/health          Health check                     │
+│   GET  /api/tariffs         Obtener tarifas                  │
+│   POST /api/upload-csv      Procesar CSV                     │
+│   POST /api/simulate        Simulación con datos             │
+│   POST /api/demo-simulate   Simulación con demo              │
+│                                                             │
+│ MOTOR DE SIMULACIÓN                                         │
+│ • src/simulation_engine.py  Cálculos (validado)              │
+│ • src/consumption_processor.py Limpieza de datos             │
+│ • agents/advisor.py         Análisis y ranking               │
+└─────────────────────────────────────────────────────────────┘
+
+FLUJO DE DATOS:
+Usuario hace clic en "Simular"
+  ↓
+JavaScript envía JSON al backend
+  ↓
+Flask recibe en /api/demo-simulate
+  ↓
+Python crea perfiles de consumo
+  ↓
+Motor de simulación calcula costos
+  ↓
+Asesor genera ranking
+  ↓
+Backend devuelve JSON con resultados
+  ↓
+JavaScript renderiza en HTML
+  ↓
+Usuario ve ranking en pantalla
+
+═══════════════════════════════════════════════════════════════════════════════
+📱 RESPONSIVIDAD
+═══════════════════════════════════════════════════════════════════════════════
+
+DESKTOP (1200px+)
+├─ 2 columnas (Configuración | Resultados)
+├─ Header ancho
+└─ Métricas en grid 2x2
+
+TABLET (768px - 1199px)
+├─ 1 columna (apilado)
+├─ Inputs más grandes
+└─ Métricas en grid 2x2
+
+MÓVIL (<768px)
+├─ 1 columna completa
+├─ Inputs optimizados para toque
+├─ Tabs horizontales
+└─ Métricas en grid 1x4 (scroll horizontal)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✨ ¡Interfaz lista para usar! ✨
+
+Para más detalles: WEB_INTERFACE.md
+Para ejecutar: ./run_web.sh
+Para parar: Ctrl+C en la terminal
+
+═══════════════════════════════════════════════════════════════════════════════

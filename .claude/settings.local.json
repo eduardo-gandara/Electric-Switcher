@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python test_simulation.py)",
+      "Bash(python3 test_simulation.py)",
+      "Bash(pip install *)",
+      "Bash(chmod +x /home/gandara/Projects/Electric-Switcher/run_web.sh)",
+      "Bash(cat)",
+      "Read(//tmp/**)",
+      "Bash(cat > *)",
+      "Bash(python app.py)",
+      "Bash(python3 app.py)",
+      "Bash(curl http://localhost:5000/api/health)",
+      "Bash(kill -9 1542445 1546703)",
+      "Bash(pkill -f \"python3 app.py\")",
+      "Bash(python3 agents/tariff_collector.py)",
+      "Bash(chmod +x /home/gandara/Projects/Electric-Switcher/collect_tariffs.py)",
+      "Bash(python3 collect_tariffs.py --report)",
+      "Bash(python3 collect_tariffs.py --export)",
+      "Bash(curl -s -X POST http://localhost:5000/api/collect-tariffs -H \"Content-Type: application/json\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s http://localhost:5000/api/health)",
+      "Bash(git add *)",
+      "Bash(find /home/gandara -name \"*.csv\" -type f 2>/dev/null | head -5)",
+      "Bash(python3)",
+      "Bash(awk '{print $2}')",
+      "Bash(kill -9 1589072)",
+      "Bash(pkill -f \"python app.py\")",
+      "Bash(python -c \"from src.simulation_engine import SimulationEngine; print\\('OK'\\)\")",
+      "Bash(curl -s -X GET http://localhost:5000/api/health)",
+      "Bash(killall python *)",
+      "Bash(/home/gandara/Projects/Electric-Switcher/venv/bin/python /home/gandara/Projects/Electric-Switcher/app.py)"
+    ]
+  }
+}

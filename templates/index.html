@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>⚡ Electric Switcher - Electricity Tariff Simulator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+        html, body { height: 100%; width: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: var(--gray-900);
+            overflow-x: hidden;
+        }
+        .container { max-width: 1200px; margin: 0 auto; width: 100%; }
+        header {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        header h1 { font-size: clamp(1.5em, 5vw, 2.5em); color: var(--primary); margin-bottom: 8px; }
+        header p { color: var(--gray-700); }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .card h2 { color: var(--primary); margin-bottom: 20px; border-bottom: 2px solid var(--gray-100); padding-bottom: 10px; }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn-secondary { background: var(--gray-100); color: var(--gray-900); }
+        .btn-secondary:hover { background: var(--gray-200); }
+
+        input[type="file"] { padding: 8px; margin: 10px 0; }
+
+        .status {
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+        .status.error { background: #fee2e2; color: #991b1b; }
+        .status.success { background: #d1fae5; color: #065f46; }
+        .status.loading { background: #e0e7ff; color: var(--primary); }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 3px solid rgba(37, 99, 235, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metric {
+            background: var(--gray-50);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric-value { font-size: 1.8em; font-weight: bold; color: var(--primary); }
+        .metric-label { font-size: 0.85em; color: var(--gray-700); margin-top: 5px; }
+
+        .providers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .provider-btn {
+            padding: 15px;
+            background: var(--gray-50);
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        .provider-btn:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2); }
+        .provider-btn.active { background: var(--primary); color: white; border-color: var(--primary-dark); }
+
+        .tariffs-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .tariff-item {
+            background: var(--gray-50);
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tariff-item:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2); }
+        .tariff-item.selected { background: var(--primary); color: white; border-color: var(--primary-dark); }
+
+        .tariff-name { font-weight: 600; margin-bottom: 8px; }
+        .tariff-rate { font-size: 1.3em; font-weight: bold; color: var(--success); margin: 8px 0; }
+        .tariff-item.selected .tariff-rate { color: white; }
+        .tariff-detail { font-size: 0.85em; margin: 4px 0; opacity: 0.8; }
+
+        .controls { margin: 20px 0; display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white;
+            margin: auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-close { float: right; font-size: 28px; cursor: pointer; color: var(--gray-700); }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 20px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .detail-label { font-weight: 600; color: var(--primary); }
+        .detail-value { color: var(--gray-700); }
+
+        @media (max-width: 640px) {
+            .providers-grid, .tariffs-container { grid-template-columns: 1fr; }
+            .detail-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ Electric Switcher</h1>
+            <p>Compare Electricity Tariffs and Save Money</p>
+        </header>
+
+        <!-- SECTION 1: UPLOAD CSV -->
+        <div id="uploadSection" class="section active">
+            <div class="card">
+                <h2>📁 Step 1: Upload Your Consumption Data</h2>
+                <p style="margin: 15px 0; color: var(--gray-700);">
+                    Upload your ESB Networks CSV file. File should have: MPRN, Meter Serial Number, Read Value, Read Type, Read Date and End Time
+                </p>
+                <div style="margin: 15px 0;">
+                    <input type="file" id="csvFile" accept=".csv" style="width: 100%; padding: 10px; border: 2px solid var(--gray-200); border-radius: 8px;">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="btn-primary" onclick="uploadCSV()">📤 Upload File</button>
+                    <button class="btn-secondary" onclick="uploadTestFile()">🧪 Sample Data</button>
+                </div>
+                <div id="uploadStatus"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: SELECT TARIFFS -->
+        <div id="selectSection" class="section">
+            <div class="card">
+                <h2>🔌 Step 2: Select Tariffs</h2>
+
+                <div id="fileInfo" class="metrics" style="display: none;">
+                    <div class="metric">
+                        <div class="metric-value" id="totalConsumption">0</div>
+                        <div class="metric-label">Total kWh</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="dateRange">-</div>
+                        <div class="metric-label">Period</div>
+                    </div>
+                </div>
+
+                <p style="margin: 15px 0; color: var(--gray-700);">Click a provider to see its tariffs, then select tariffs to compare.</p>
+
+                <h3 style="margin-top: 20px; margin-bottom: 10px;">Select Provider:</h3>
+                <div id="providersContainer" class="providers-grid"></div>
+
+                <h3 id="tariffsTitle" style="margin-top: 20px; margin-bottom: 10px; display: none;"></h3>
+                <div id="tariffsStatus"></div>
+                <div id="tariffsContainer" class="tariffs-container"></div>
+
+                <div class="controls" id="controlsDiv" style="display: none;">
+                    <button class="btn-secondary" onclick="goBack()">← Back</button>
+                    <button class="btn-secondary" onclick="selectAllTariffs()" style="flex: 1;">✓ Select All</button>
+                    <button class="btn-primary" onclick="compareSelected()" style="flex: 2;">Compare →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: RESULTS -->
+        <div id="resultsSection" class="section">
+            <div class="card">
+                <h2>💰 Comparison Results</h2>
+                <div id="resultsContainer"></div>
+                <button class="btn-secondary" onclick="selectMoreTariffs()" style="width: 100%; margin-top: 20px;">
+                    ← Select Different Tariffs
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tariff Details Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div id="detailsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            csvFilename: null,
+            allTariffs: [],
+            selectedProviders: new Set(),
+            selectedTariffs: new Set(),
+            tariffsByProvider: {}
+        };
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        async function uploadTestFile() {
+            const statusDiv = document.getElementById('uploadStatus');
+            statusDiv.innerHTML = '<div class="status loading"><span class="spinner"></span>Loading sample data...</div>';
+
+            try {
+                const formData = new FormData();
+                formData.append('filename', 'ESB_sample_test.csv');
+
+                const res = await fetch('/api/process-csv', { method: 'POST', body: formData });
+                const data = await res.json();
+
+                if (data.success) {
+                    state.csvFilename = 'ESB_sample_test.csv';
+                    statusDiv.innerHTML = '<div class="status success">✅ Sample data loaded!</div>';
+                    document.getElementById('fileInfo').style.display = 'grid';
+                    document.getElementById('totalConsumption').textContent = Math.round(data.quality.final_rows * 0.5) + ' kWh';
+                    document.getElementById('dateRange').textContent = data.quality.date_range.substring(0, 20);
+                    setTimeout(() => loadTariffs(), 600);
+                } else {
+                    statusDiv.innerHTML = `<div class="status error">❌ ${data.error}</div>`;
+                }
+            } catch (e) {
+                statusDiv.innerHTML = `<div class="status error">❌ ${e.message}</div>`;
+            }
+        }
+
+        async function uploadCSV() {
+            const file = document.getElementById('csvFile').files[0];
+            const statusDiv = document.getElementById('uploadStatus');
+
+            if (!file) {
+                statusDiv.innerHTML = '<div class="status error">❌ Please select a file</div>';
+                return;
+            }
+
+            statusDiv.innerHTML = '<div class="status loading"><span class="spinner"></span>Processing...</div>';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/upload-csv', { method: 'POST', body: formData, timeout: 30000 });
+
+                if (!response.ok) {
+                    statusDiv.innerHTML = `<div class="status error">❌ Server error (${response.status}). Make sure the file is readable and not locked by another application.</div>`;
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    state.csvFilename = data.filename;
+                    statusDiv.innerHTML = '<div class="status success">✅ File loaded!</div>';
+                    document.getElementById('fileInfo').style.display = 'grid';
+                    document.getElementById('totalConsumption').textContent = Math.round(data.quality.final_rows * 0.5) + ' kWh';
+                    document.getElementById('dateRange').textContent = data.quality.date_range.substring(0, 20);
+                    setTimeout(() => loadTariffs(), 600);
+                } else {
+                    statusDiv.innerHTML = `<div class="status error">❌ ${data.error}</div>`;
+                }
+            } catch (e) {
+                const errorMsg = e.message === 'Failed to fetch'
+                    ? 'Connection error. Close other applications using the file and try again.'
+                    : e.message;
+                statusDiv.innerHTML = `<div class="status error">❌ ${errorMsg}</div>`;
+            }
+        }
+
+        async function loadTariffs() {
+            document.getElementById('tariffsStatus').innerHTML = '<div class="status loading"><span class="spinner"></span>Loading tariffs...</div>';
+
+            try {
+                const response = await fetch('/api/collect-tariffs', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+                const data = await response.json();
+
+                if (data.success && data.tariffs && data.tariffs.length > 0) {
+                    state.allTariffs = data.tariffs;
+                    state.tariffsByProvider = {};
+
+                    data.tariffs.forEach(t => {
+                        if (!state.tariffsByProvider[t.supplier]) {
+                            state.tariffsByProvider[t.supplier] = [];
+                        }
+                        state.tariffsByProvider[t.supplier].push(t);
+                    });
+
+                    document.getElementById('tariffsStatus').innerHTML = `<div class="status success">✅ Loaded ${data.tariffs.length} tariffs from ${Object.keys(state.tariffsByProvider).length} providers</div>`;
+                    displayProviders();
+                    showSection('selectSection');
+                } else {
+                    document.getElementById('tariffsStatus').innerHTML = '<div class="status error">❌ No tariffs loaded</div>';
+                }
+            } catch (e) {
+                document.getElementById('tariffsStatus').innerHTML = `<div class="status error">❌ Error: ${e.message}</div>`;
+                console.error(e);
+            }
+        }
+
+        function displayProviders() {
+            const container = document.getElementById('providersContainer');
+            container.innerHTML = '';
+
+            const providers = Object.keys(state.tariffsByProvider);
+
+            // Add Select All Providers button
+            const selectAllBtn = document.createElement('button');
+            selectAllBtn.className = 'provider-btn';
+            selectAllBtn.style.gridColumn = 'span 3';
+            selectAllBtn.style.fontWeight = 'bold';
+            selectAllBtn.textContent = '✓ Select All Providers';
+            selectAllBtn.onclick = selectAllProviders;
+            container.appendChild(selectAllBtn);
+
+            providers.forEach(supplier => {
+                const btn = document.createElement('button');
+                btn.className = 'provider-btn' + (state.selectedProviders.has(supplier) ? ' active' : '');
+                btn.textContent = supplier;
+                btn.onclick = () => selectProvider(supplier);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectProvider(supplier) {
+            if (state.selectedProviders.has(supplier)) {
+                state.selectedProviders.delete(supplier);
+            } else {
+                state.selectedProviders.add(supplier);
+            }
+            displayProviders();
+            displayTariffs();
+        }
+
+        function selectAllProviders() {
+            if (state.selectedProviders.size === Object.keys(state.tariffsByProvider).length) {
+                state.selectedProviders.clear();
+            } else {
+                Object.keys(state.tariffsByProvider).forEach(p => state.selectedProviders.add(p));
+            }
+            displayProviders();
+            displayTariffs();
+        }
+
+        function displayTariffs() {
+            const container = document.getElementById('tariffsContainer');
+            const title = document.getElementById('tariffsTitle');
+            const controls = document.getElementById('controlsDiv');
+
+            if (state.selectedProviders.size === 0) {
+                title.style.display = 'none';
+                controls.style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+
+            const allTariffs = [];
+            state.selectedProviders.forEach(supplier => {
+                allTariffs.push(...state.tariffsByProvider[supplier]);
+            });
+
+            const providerList = Array.from(state.selectedProviders).join(', ');
+            title.textContent = `${providerList} (${allTariffs.length} tariffs)`;
+            title.style.display = 'block';
+            controls.style.display = 'flex';
+            container.innerHTML = '';
+
+            allTariffs.forEach(tariff => {
+                const id = `${tariff.supplier}_${tariff.plan_name}`;
+                const isSelected = state.selectedTariffs.has(id);
+
+                const card = document.createElement('div');
+                card.className = 'tariff-item' + (isSelected ? ' selected' : '');
+                const day = tariff.unit_rates_c_per_kwh_ex_vat?.day || '-';
+                const night = tariff.unit_rates_c_per_kwh_ex_vat?.night || '-';
+                const peak = tariff.unit_rates_c_per_kwh_ex_vat?.peak || '-';
+                card.innerHTML = `
+                    <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleTariff('${id}')">
+                    <div class="tariff-name">${tariff.plan_name}</div>
+                    <div class="tariff-supplier" style="font-size: 0.85em; color: #666;">${tariff.supplier}</div>
+                    <div class="tariff-rate">${day} c/kWh</div>
+                    <div class="tariff-detail">Night: ${night} | Peak: ${peak}</div>
+                    <div class="tariff-detail" style="margin-top: 8px;">
+                        <button class="btn-secondary" style="width: 100%; font-size: 0.85em; padding: 8px;" onclick="showDetails('${tariff.supplier}', '${tariff.plan_name}')">Details</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleTariff(id) {
+            if (state.selectedTariffs.has(id)) {
+                state.selectedTariffs.delete(id);
+            } else {
+                state.selectedTariffs.add(id);
+            }
+            displayTariffs();
+        }
+
+        function selectAllTariffs() {
+            state.selectedProviders.forEach(supplier => {
+                const tariffs = state.tariffsByProvider[supplier];
+                tariffs.forEach(t => {
+                    state.selectedTariffs.add(`${t.supplier}_${t.plan_name}`);
+                });
+            });
+            displayTariffs();
+        }
+
+        function showDetails(supplier, planName) {
+            const tariff = state.allTariffs.find(t => t.supplier === supplier && t.plan_name === planName);
+            if (!tariff) return;
+
+            const rates = tariff.unit_rates_c_per_kwh_ex_vat || {};
+            let html = `<h3>💡 ${tariff.plan_name}</h3>`;
+
+            html += `<div class="detail-row"><div class="detail-label">Tariff Name</div><div class="detail-value"><strong>${tariff.plan_name}</strong></div></div>`;
+            html += `<div class="detail-row"><div class="detail-label">Supplier</div><div class="detail-value">${tariff.supplier}</div></div>`;
+            html += `<div class="detail-row"><div class="detail-label">Day Rate (ex VAT)</div><div class="detail-value">${rates.day || '-'} c/kWh</div></div>`;
+            html += `<div class="detail-row"><div class="detail-label">Night Rate (ex VAT)</div><div class="detail-value">${rates.night || '-'} c/kWh</div></div>`;
+            html += `<div class="detail-row"><div class="detail-label">Peak Rate (ex VAT)</div><div class="detail-value">${rates.peak || '-'} c/kWh</div></div>`;
+            html += `<div class="detail-row"><div class="detail-label">Standing Charge</div><div class="detail-value">${tariff.standing_charge_c_per_day || '-'} c/day</div></div>`;
+            html += `<div class="detail-row"><div class="detail-label">PSO Levy</div><div class="detail-value">${tariff.pso_levy_eur_per_month || '-'} €/month</div></div>`;
+
+            if (tariff.discount) {
+                html += `<div class="detail-row"><div class="detail-label">Discount</div><div class="detail-value">${tariff.discount.percent}% for ${tariff.discount.months} months</div></div>`;
+            }
+
+            html += `<div class="detail-row"><div class="detail-label">Cashback</div><div class="detail-value">${tariff.cashback_eur || '0'} €</div></div>`;
+            html += `<div class="detail-row"><div class="detail-label">Exit Fee</div><div class="detail-value">${tariff.exit_fee_eur || '0'} €</div></div>`;
+            html += `<div class="detail-row"><div class="detail-label">IVA (VAT)</div><div class="detail-value">9% included in final calculation</div></div>`;
+            html += `<div class="detail-row"><div class="detail-label">Source</div><div class="detail-value"><a href="${tariff.source_url}" target="_blank">Official Website</a></div></div>`;
+            html += `<div class="detail-row"><div class="detail-label">Last Updated</div><div class="detail-value">${tariff.extracted_at}</div></div>`;
+
+            document.getElementById('detailsContent').innerHTML = html;
+            document.getElementById('detailsModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').classList.remove('show');
+        }
+
+        async function compareSelected() {
+            if (state.selectedTariffs.size === 0) {
+                alert('Please select at least one tariff');
+                return;
+            }
+
+            if (!state.csvFilename) {
+                alert('Please load a CSV file first');
+                return;
+            }
+
+            const selected = state.allTariffs.filter(t => state.selectedTariffs.has(`${t.supplier}_${t.plan_name}`));
+
+            try {
+                const response = await fetch('/api/simulate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        csv_filename: state.csvFilename,
+                        tariffs: selected
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    displayResults(data.results, data.report);
+                    showSection('resultsSection');
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+                console.error(e);
+            }
+        }
+
+        window.comparisonResults = [];
+
+        function displayResults(results, report) {
+            window.comparisonResults = results;
+            let html = `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">`;
+            results.forEach((r, i) => {
+                const savings = report.assumptions.reference_cost_eur - r.total_cost_eur;
+                const monthlyAvg = r.total_cost_eur / 12;
+                html += `
+                    <div style="background: white; border: 2px solid ${i === 0 ? 'var(--success)' : 'var(--gray-200)'}; padding: 20px; border-radius: 12px; cursor: pointer; transition: all 0.3s;">
+                        <div style="display: inline-block; background: var(--primary); color: white; padding: 6px 12px; border-radius: 6px; font-weight: bold; margin-bottom: 12px; font-size: 0.9em;">#${i+1}</div>
+                        <h3 style="margin: 12px 0 8px 0; color: var(--primary); font-size: 1.1em;">${r.plan_name}</h3>
+                        <p style="color: var(--gray-700); margin: 8px 0; font-size: 0.95em; font-weight: 500;">${r.supplier}</p>
+                        <div style="border-top: 1px solid var(--gray-200); padding-top: 12px; margin-top: 12px;">
+                            <div style="font-size: 1.6em; font-weight: bold; color: var(--primary); margin: 8px 0;">${r.total_cost_eur.toFixed(2)} €/year</div>
+                            <div style="font-size: 0.9em; color: var(--gray-700);">≈ ${monthlyAvg.toFixed(2)} €/month</div>
+                        </div>
+                        ${savings > 0 ? `<div style="background: #d1fae5; padding: 10px; border-radius: 6px; color: #065f46; margin-top: 10px; font-weight: 500;">💰 Save ${savings.toFixed(2)} € (${((savings/report.assumptions.reference_cost_eur)*100).toFixed(1)}%)</div>` : ''}
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gray-200); display: flex; gap: 10px;">
+                            <small style="color: var(--primary); font-weight: 500; cursor: pointer; flex: 1;" onclick="showMonthlyBreakdown(${i})">📊 Breakdown</small>
+                            <small style="color: var(--primary); font-weight: 500; cursor: pointer; flex: 1;" onclick="showDetails('${r.supplier}', '${r.plan_name}')">ℹ️ Details</small>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            if (report.recommendations) {
+                html += '<div style="background: var(--gray-50); padding: 20px; border-radius: 12px; margin-top: 20px;"><h3 style="color: var(--primary); margin-bottom: 15px;">💡 Recommendations</h3>';
+                report.recommendations.forEach(r => {
+                    html += `<p style="margin: 10px 0; padding: 10px; background: white; border-left: 3px solid var(--primary); border-radius: 4px;">${r}</p>`;
+                });
+                html += '</div>';
+            }
+
+            document.getElementById('resultsContainer').innerHTML = html;
+        }
+
+        function showMonthlyBreakdown(index) {
+            if (!window.comparisonResults || !window.comparisonResults[index]) {
+                alert('No data available');
+                return;
+            }
+
+            const tariffData = window.comparisonResults[index];
+            const breakdown = tariffData.monthly_breakdown;
+            if (!breakdown) {
+                alert('No monthly data available');
+                return;
+            }
+
+            let html = `<div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; overflow-y: auto;" id="monthlyModal">
+                <div style="background: white; border-radius: 12px; padding: 30px; max-width: 900px; width: 90%; max-height: 90vh; overflow-auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3); margin: 20px auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: var(--primary); margin: 0;">${tariffData.plan_name} - Monthly Breakdown</h2>
+                        <button style="background: none; border: none; font-size: 1.5em; cursor: pointer; color: var(--gray-700);" onclick="document.getElementById('monthlyModal').remove()">×</button>
+                    </div>
+                    <p style="color: var(--gray-700); margin-bottom: 20px;"><strong>${tariffData.supplier}</strong> | Total: <strong style="color: var(--primary); font-size: 1.2em;">${tariffData.total_cost_eur.toFixed(2)}€/year</strong></p>`;
+
+            const maxCost = Math.max(...breakdown.map(m => m.total_eur || 0));
+            const chartHeight = 280;
+            let chartBars = '';
+            breakdown.forEach((m, i) => {
+                const cost = m.total_eur || 0;
+                const height = (cost / maxCost) * chartHeight;
+                const x = i * 15 + 5;
+                chartBars += `<g><rect x="${x}%" y="${chartHeight - height}" width="12%" height="${height}" fill="var(--primary)" opacity="0.85" rx="3"/><text x="${x + 6}%" y="${chartHeight + 20}" text-anchor="middle" font-size="11" fill="var(--gray-700)">${m.year_month}</text><text x="${x + 6}%" y="${chartHeight - height - 8}" text-anchor="middle" font-size="10" font-weight="bold" fill="var(--primary)">${cost.toFixed(0)}€</text></g>`;
+            });
+
+            html += `<svg style="width: 100%; height: 380px; margin-bottom: 20px; border: 1px solid var(--gray-200); border-radius: 8px; background: var(--gray-50);" viewBox="0 0 100 350">
+                <g><text x="2" y="20" font-size="13" font-weight="bold" fill="var(--gray-700)">Monthly Costs (€)</text>${chartBars}<line x1="0" y1="${chartHeight}" x2="100" y2="${chartHeight}" stroke="var(--gray-300)" stroke-width="1.5"/><text x="1" y="${chartHeight + 15}" font-size="10" fill="var(--gray-600)">€0</text></g>
+            </svg>
+                    <div style="background: var(--gray-50); padding: 15px; border-radius: 8px; text-align: center;">
+                        <p style="margin: 0; color: var(--gray-700);">Average per month: <strong>${(tariffData.average_cost_monthly || 0).toFixed(2)}€</strong></p>
+                    </div>
+                </div>
+            </div>`;
+
+            document.body.insertAdjacentHTML('beforeend', html);
+            // Close modal on background click
+            document.getElementById('monthlyModal').onclick = function(e) {
+                if (e.target === this) this.remove();
+            };
+        }
+
+        function goBack() {
+            state.selectedProviders.clear();
+            state.selectedTariffs.clear();
+            displayProviders();
+            displayTariffs();
+            showSection('selectSection');
+        }
+
+        function selectMoreTariffs() {
+            state.selectedTariffs.clear();
+            goBack();
+            showSection('selectSection');
+        }
+
+        document.getElementById('detailsModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('detailsModal')) closeModal();
+        });
+    </script>
+</body>
+</html>

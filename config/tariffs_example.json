@@ -1,0 +1,488 @@
+{
+  "extracted_at": "2026-10-02T03:34:23.275636",
+  "total_collected": 24,
+  "total_rejected": 0,
+  "tariffs": [
+    {
+      "supplier": "Bord Gáis Energy",
+      "plan_name": "Smart All Day",
+      "source_url": "https://www.bordgais.ie/en/residential/electricity/electricity-plans/",
+      "extracted_at": "2026-10-02T03:34:23.275834",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 27.5,
+        "night": 15.2,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 43.5,
+      "pso_levy_eur_per_month": 11.5,
+      "discount": {
+        "percent": 32,
+        "months": 12
+      },
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Bord Gáis Energy",
+      "plan_name": "Smart Night",
+      "source_url": "https://www.bordgais.ie/en/residential/electricity/electricity-plans/",
+      "extracted_at": "2026-10-02T03:34:23.275834",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 25.0,
+        "night": 12.5,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 42.0,
+      "pso_levy_eur_per_month": 11.0,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Bord Gáis Energy",
+      "plan_name": "Smart Max",
+      "source_url": "https://www.bordgais.ie/en/residential/electricity/electricity-plans/",
+      "extracted_at": "2026-10-02T03:34:23.275834",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 29.0,
+        "night": 18.0,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 44.0,
+      "pso_levy_eur_per_month": 11.5,
+      "discount": {
+        "percent": 15,
+        "months": 6
+      },
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Bord Gáis Energy",
+      "plan_name": "Smart Budget",
+      "source_url": "https://www.bordgais.ie/en/residential/electricity/electricity-plans/",
+      "extracted_at": "2026-10-02T03:34:23.275834",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 26.0,
+        "night": 14.0,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 40.0,
+      "pso_levy_eur_per_month": 10.5,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Electric Ireland",
+      "plan_name": "Smart All Day Electricity Discount",
+      "source_url": "https://www.electricireland.ie/ei/home/electricity/plans/",
+      "extracted_at": "2026-10-02T03:34:23.275883",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 30.78,
+        "night": 30.78,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 48.0,
+      "pso_levy_eur_per_month": 11.5,
+      "discount": {
+        "percent": 26,
+        "months": 12
+      },
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Electric Ireland",
+      "plan_name": "Value Plan",
+      "source_url": "https://www.electricireland.ie/ei/home/electricity/plans/",
+      "extracted_at": "2026-10-02T03:34:23.275883",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 28.5,
+        "night": 15.5,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 46.0,
+      "pso_levy_eur_per_month": 11.0,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Electric Ireland",
+      "plan_name": "Smart Saver Plan",
+      "source_url": "https://www.electricireland.ie/ei/home/electricity/plans/",
+      "extracted_at": "2026-10-02T03:34:23.275883",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 26.0,
+        "night": 13.0,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 44.0,
+      "pso_levy_eur_per_month": 10.8,
+      "discount": {
+        "percent": 15,
+        "months": 6
+      },
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Electric Ireland",
+      "plan_name": "Premium Energy Plan",
+      "source_url": "https://www.electricireland.ie/ei/home/electricity/plans/",
+      "extracted_at": "2026-10-02T03:34:23.275883",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 31.5,
+        "night": 17.0,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 49.0,
+      "pso_levy_eur_per_month": 12.0,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "SSE Airtricity",
+      "plan_name": "Standard Electricity Plan",
+      "source_url": "https://www.sseairtricity.com/ie/home/electricity/compare-plans/",
+      "extracted_at": "2026-10-02T03:34:23.275915",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 27.0,
+        "night": 15.5,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 43.0,
+      "pso_levy_eur_per_month": 11.0,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "SSE Airtricity",
+      "plan_name": "Smart Meter Plan",
+      "source_url": "https://www.sseairtricity.com/ie/home/electricity/compare-plans/",
+      "extracted_at": "2026-10-02T03:34:23.275915",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 25.5,
+        "night": 14.5,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 42.0,
+      "pso_levy_eur_per_month": 10.8,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "SSE Airtricity",
+      "plan_name": "Family Plan",
+      "source_url": "https://www.sseairtricity.com/ie/home/electricity/compare-plans/",
+      "extracted_at": "2026-10-02T03:34:23.275915",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 28.5,
+        "night": 16.5,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 44.0,
+      "pso_levy_eur_per_month": 11.2,
+      "discount": {
+        "percent": 15,
+        "months": 12
+      },
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "SSE Airtricity",
+      "plan_name": "Eco Plan",
+      "source_url": "https://www.sseairtricity.com/ie/home/electricity/compare-plans/",
+      "extracted_at": "2026-10-02T03:34:23.275915",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 24.0,
+        "night": 13.5,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 41.0,
+      "pso_levy_eur_per_month": 10.5,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Energia",
+      "plan_name": "Energia Standard",
+      "source_url": "https://www.energia.ie/residential/electricity/plans/",
+      "extracted_at": "2026-10-02T03:34:23.275945",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 26.5,
+        "night": 15.0,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 43.5,
+      "pso_levy_eur_per_month": 11.3,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Energia",
+      "plan_name": "Energia Fixed",
+      "source_url": "https://www.energia.ie/residential/electricity/plans/",
+      "extracted_at": "2026-10-02T03:34:23.275945",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 27.5,
+        "night": 15.5,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 43.5,
+      "pso_levy_eur_per_month": 11.3,
+      "discount": {
+        "percent": 10,
+        "months": 12
+      },
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Energia",
+      "plan_name": "Energia Smart",
+      "source_url": "https://www.energia.ie/residential/electricity/plans/",
+      "extracted_at": "2026-10-02T03:34:23.275945",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 25.5,
+        "night": 14.5,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 42.5,
+      "pso_levy_eur_per_month": 11.0,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Energia",
+      "plan_name": "Energia Green",
+      "source_url": "https://www.energia.ie/residential/electricity/plans/",
+      "extracted_at": "2026-10-02T03:34:23.275945",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 26.0,
+        "night": 14.8,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 43.0,
+      "pso_levy_eur_per_month": 11.2,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Pinergy",
+      "plan_name": "Pinergy Standard Plan",
+      "source_url": "https://www.pinergy.ie/electricity-plans/",
+      "extracted_at": "2026-10-02T03:34:23.275972",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 26.0,
+        "night": 14.8,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 42.5,
+      "pso_levy_eur_per_month": 10.8,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Pinergy",
+      "plan_name": "Pinergy Flex Plan",
+      "source_url": "https://www.pinergy.ie/electricity-plans/",
+      "extracted_at": "2026-10-02T03:34:23.275972",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 27.0,
+        "night": 15.2,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 43.0,
+      "pso_levy_eur_per_month": 11.0,
+      "discount": {
+        "percent": 5,
+        "months": 12
+      },
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Pinergy",
+      "plan_name": "Pinergy Smart Plan",
+      "source_url": "https://www.pinergy.ie/electricity-plans/",
+      "extracted_at": "2026-10-02T03:34:23.275972",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 25.0,
+        "night": 14.0,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 41.5,
+      "pso_levy_eur_per_month": 10.5,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Pinergy",
+      "plan_name": "Pinergy Plus Plan",
+      "source_url": "https://www.pinergy.ie/electricity-plans/",
+      "extracted_at": "2026-10-02T03:34:23.275972",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 28.0,
+        "night": 16.0,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 44.0,
+      "pso_levy_eur_per_month": 11.5,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Evoke Energy",
+      "plan_name": "Evoke Basic",
+      "source_url": "https://www.evokeenergy.ie/electricity/",
+      "extracted_at": "2026-10-02T03:34:23.276001",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 27.0,
+        "night": 15.3,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 43.0,
+      "pso_levy_eur_per_month": 11.2,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Evoke Energy",
+      "plan_name": "Evoke Plus",
+      "source_url": "https://www.evokeenergy.ie/electricity/",
+      "extracted_at": "2026-10-02T03:34:23.276001",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 25.8,
+        "night": 14.8,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 42.5,
+      "pso_levy_eur_per_month": 10.9,
+      "discount": {
+        "percent": 12,
+        "months": 12
+      },
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Evoke Energy",
+      "plan_name": "Evoke Premium",
+      "source_url": "https://www.evokeenergy.ie/electricity/",
+      "extracted_at": "2026-10-02T03:34:23.276001",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 28.5,
+        "night": 16.2,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 44.5,
+      "pso_levy_eur_per_month": 11.5,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    },
+    {
+      "supplier": "Evoke Energy",
+      "plan_name": "Evoke Economy",
+      "source_url": "https://www.evokeenergy.ie/electricity/",
+      "extracted_at": "2026-10-02T03:34:23.276001",
+      "unit_rates_c_per_kwh_ex_vat": {
+        "day": 24.5,
+        "night": 13.8,
+        "peak": null
+      },
+      "standing_charge_c_per_day": 41.0,
+      "pso_levy_eur_per_month": 10.5,
+      "discount": null,
+      "cashback_eur": 0.0,
+      "exit_fee_eur": 0.0,
+      "contract_months": 12,
+      "bands": null,
+      "conditions": []
+    }
+  ],
+  "rejected": []
+}

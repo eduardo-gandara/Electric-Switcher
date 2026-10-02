@@ -1,0 +1,210 @@
+[
+  {
+    "supplier": "Electric Ireland",
+    "plan_name": "Smart Day & Night (sample)",
+    "source_url": "https://www.electricireland.ie/",
+    "extracted_at": "2026-09-28",
+    "period": "2026-06 a 2026-09",
+    "months": 4,
+    "total_consumption_kwh": 1096.0,
+    "total_cost_eur": 269.8,
+    "average_cost_monthly": 67.45,
+    "monthly_breakdown": [
+      {
+        "year_month": "2026-06",
+        "consumption_kwh": 271.0,
+        "consumption_by_band": {
+          "day": 271.0,
+          "night": 0.0,
+          "peak": 0.0
+        },
+        "consumption_cost_c": 8638.125,
+        "standing_charge_c": 1864.5,
+        "pso_levy_c": 146.0,
+        "subtotal_c": 10648.625,
+        "discount_percent": 15.0,
+        "discount_amount_c": 1597.29375,
+        "iva_amount_c": 958.3762499999999,
+        "iva_rate": 0.09,
+        "cashback_c": 5000.0,
+        "total_c": 6607.001249999999,
+        "total_eur": 66.07001249999999,
+        "days_in_month": 30
+      },
+      {
+        "year_month": "2026-07",
+        "consumption_kwh": 297.0,
+        "consumption_by_band": {
+          "day": 297.0,
+          "night": 0.0,
+          "peak": 0.0
+        },
+        "consumption_cost_c": 9466.875,
+        "standing_charge_c": 1926.6499999999999,
+        "pso_levy_c": 146.0,
+        "subtotal_c": 11539.525,
+        "discount_percent": 15.0,
+        "discount_amount_c": 1730.92875,
+        "iva_amount_c": 1038.5572499999998,
+        "iva_rate": 0.09,
+        "cashback_c": 5000.0,
+        "total_c": 7578.0822499999995,
+        "total_eur": 75.7808225,
+        "days_in_month": 31
+      },
+      {
+        "year_month": "2026-08",
+        "consumption_kwh": 311.0,
+        "consumption_by_band": {
+          "day": 311.0,
+          "night": 0.0,
+          "peak": 0.0
+        },
+        "consumption_cost_c": 9913.125,
+        "standing_charge_c": 1926.6499999999999,
+        "pso_levy_c": 146.0,
+        "subtotal_c": 11985.775,
+        "discount_percent": 15.0,
+        "discount_amount_c": 1797.86625,
+        "iva_amount_c": 1078.71975,
+        "iva_rate": 0.09,
+        "cashback_c": 5000.0,
+        "total_c": 8064.49475,
+        "total_eur": 80.6449475,
+        "days_in_month": 31
+      },
+      {
+        "year_month": "2026-09",
+        "consumption_kwh": 217.0,
+        "consumption_by_band": {
+          "day": 217.0,
+          "night": 0.0,
+          "peak": 0.0
+        },
+        "consumption_cost_c": 6916.875,
+        "standing_charge_c": 1864.5,
+        "pso_levy_c": 146.0,
+        "subtotal_c": 8927.375,
+        "discount_percent": 15.0,
+        "discount_amount_c": 1339.10625,
+        "iva_amount_c": 803.46375,
+        "iva_rate": 0.09,
+        "cashback_c": 5000.0,
+        "total_c": 4730.838750000001,
+        "total_eur": 47.30838750000001,
+        "days_in_month": 30
+      }
+    ],
+    "discount": {
+      "percent": 15.0,
+      "applies_to": "consumption",
+      "months": 6
+    },
+    "cashback": 50.0,
+    "exit_fee": 0.0
+  },
+  {
+    "supplier": "Bord Gáis",
+    "plan_name": "Smart All Day",
+    "source_url": "https://bordgais.ie/electricity/rates/",
+    "extracted_at": "2026-10-01",
+    "period": "2026-06 a 2026-09",
+    "months": 4,
+    "total_consumption_kwh": 1096.0,
+    "total_cost_eur": 398.17,
+    "average_cost_monthly": 99.54,
+    "monthly_breakdown": [
+      {
+        "year_month": "2026-06",
+        "consumption_kwh": 271.0,
+        "consumption_by_band": {
+          "day": 271.0,
+          "night": 0.0,
+          "peak": 0.0
+        },
+        "consumption_cost_c": 7032.124799999999,
+        "standing_charge_c": 1845.6000000000001,
+        "pso_levy_c": 146.0,
+        "subtotal_c": 9023.724799999998,
+        "discount_percent": 32.0,
+        "discount_amount_c": 2887.5919359999994,
+        "iva_amount_c": 812.1352319999997,
+        "iva_rate": 0.09,
+        "cashback_c": 0.0,
+        "total_c": 9835.860031999999,
+        "total_eur": 98.35860032,
+        "days_in_month": 30
+      },
+      {
+        "year_month": "2026-07",
+        "consumption_kwh": 297.0,
+        "consumption_by_band": {
+          "day": 297.0,
+          "night": 0.0,
+          "peak": 0.0
+        },
+        "consumption_cost_c": 7706.793599999998,
+        "standing_charge_c": 1907.1200000000001,
+        "pso_levy_c": 146.0,
+        "subtotal_c": 9759.913599999998,
+        "discount_percent": 32.0,
+        "discount_amount_c": 3123.1723519999996,
+        "iva_amount_c": 878.3922239999998,
+        "iva_rate": 0.09,
+        "cashback_c": 0.0,
+        "total_c": 10638.305823999997,
+        "total_eur": 106.38305823999997,
+        "days_in_month": 31
+      },
+      {
+        "year_month": "2026-08",
+        "consumption_kwh": 311.0,
+        "consumption_by_band": {
+          "day": 311.0,
+          "night": 0.0,
+          "peak": 0.0
+        },
+        "consumption_cost_c": 8070.076799999998,
+        "standing_charge_c": 1907.1200000000001,
+        "pso_levy_c": 146.0,
+        "subtotal_c": 10123.196799999998,
+        "discount_percent": 32.0,
+        "discount_amount_c": 3239.4229759999994,
+        "iva_amount_c": 911.0877119999998,
+        "iva_rate": 0.09,
+        "cashback_c": 0.0,
+        "total_c": 11034.284511999998,
+        "total_eur": 110.34284511999998,
+        "days_in_month": 31
+      },
+      {
+        "year_month": "2026-09",
+        "consumption_kwh": 217.0,
+        "consumption_by_band": {
+          "day": 217.0,
+          "night": 0.0,
+          "peak": 0.0
+        },
+        "consumption_cost_c": 5630.889599999999,
+        "standing_charge_c": 1845.6000000000001,
+        "pso_levy_c": 146.0,
+        "subtotal_c": 7622.489599999999,
+        "discount_percent": 32.0,
+        "discount_amount_c": 2439.1966719999996,
+        "iva_amount_c": 686.0240639999998,
+        "iva_rate": 0.09,
+        "cashback_c": 0.0,
+        "total_c": 8308.513663999998,
+        "total_eur": 83.08513663999999,
+        "days_in_month": 30
+      }
+    ],
+    "discount": {
+      "percent": 32.0,
+      "applies_to": "consumption",
+      "months": 12
+    },
+    "cashback": 0.0,
+    "exit_fee": 0.0
+  }
+]

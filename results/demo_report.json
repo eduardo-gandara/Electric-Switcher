@@ -1,0 +1,91 @@
+{
+  "generated_at": "2026-10-02T00:10:07.252006",
+  "ranking": {
+    "top_1": {
+      "supplier": "Electric Ireland",
+      "plan": "Smart Day & Night (sample)",
+      "source_url": "https://www.electricireland.ie/",
+      "extracted_at": "2026-09-28",
+      "cost_eur": 269.8,
+      "savings_vs_reference_eur": 0.0,
+      "savings_percent": 0.0,
+      "monthly_average": 67.45,
+      "conditions": [],
+      "exit_fee": 0.0,
+      "cashback": 50.0
+    },
+    "top_2": {
+      "supplier": "Bord Gáis",
+      "plan": "Smart All Day",
+      "source_url": "https://bordgais.ie/electricity/rates/",
+      "extracted_at": "2026-10-01",
+      "cost_eur": 398.17,
+      "savings_vs_reference_eur": -128.37,
+      "savings_percent": -47.58,
+      "monthly_average": 99.54,
+      "conditions": [],
+      "exit_fee": 0.0,
+      "cashback": 0.0
+    },
+    "top_3": null
+  },
+  "assumptions": {
+    "period": "2026-06 a 2026-09",
+    "total_consumption_kwh": 1096.0,
+    "reference_tariff": "Smart Day & Night (sample)",
+    "reference_cost_eur": 269.8,
+    "iva_rate": 0.09,
+    "notes": [
+      "Ranking usa costo neto a 12 meses",
+      "No se asume cambio automático de proveedor",
+      "Precios normalizados a c/kWh sin IVA",
+      "Cashback, penalización de salida y descuentos incluidos"
+    ]
+  },
+  "sensitivity": {
+    "base": {
+      "scenario": "base",
+      "adjusted_cost": 269.8,
+      "stays_on_top": true
+    },
+    "+20%": {
+      "scenario": "+20%",
+      "adjusted_cost": 323.76,
+      "stays_on_top": true
+    },
+    "-20%": {
+      "scenario": "-20%",
+      "adjusted_cost": 215.84,
+      "stays_on_top": true
+    }
+  },
+  "validations": [
+    {
+      "tariff": "Smart All Day",
+      "supplier": "Bord Gáis",
+      "issues": [
+        "Unusual rate: 108.99 c/kWh"
+      ]
+    }
+  ],
+  "risks": [
+    {
+      "rank": 2,
+      "supplier": "Bord Gáis",
+      "plan": "Smart All Day",
+      "risks": [
+        {
+          "type": "new_customer_discount_decay",
+          "severity": "high",
+          "description": "Descuento del 32.0% se aplica solo el primer año",
+          "mitigation": "Verificar precio tras renovación"
+        }
+      ]
+    }
+  ],
+  "recommendations": [
+    "La tarifa actual es competitiva",
+    "Verificar en https://www.electricireland.ie/ antes de decidir",
+    "Este ranking asume consumo histórico. Si tu hogar cambia (EV, bomba de calor), recalcula"
+  ]
+}
