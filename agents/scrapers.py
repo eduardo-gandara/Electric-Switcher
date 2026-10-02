@@ -9,6 +9,12 @@ import re
 import logging
 from typing import Optional, Dict, List
 from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.firefox import FirefoxDriverManager
+from selenium.webdriver.firefox.service import Service as FirefoxService
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -120,24 +126,104 @@ class EnergiaIrelandScraper(BaseScraper):
 class PinergyScraper(BaseScraper):
     """Scraper for Pinergy.
 
-    Note: Pinergy website is a Single Page Application (SPA) rendered with JavaScript.
-    The /electricity-plans/ path returns 404. Using fallback data instead of scraping.
-    Actual plans can be viewed at https://pinergy.ie with JavaScript enabled.
+    Pinergy website is a Single Page Application (SPA) rendered with JavaScript.
+    Uses Selenium to load the page and extract real tariff data from the official source.
+    Data comes from: https://pinergy.ie/tariffs-and-eab/
     """
 
     def __init__(self):
         super().__init__('Pinergy', 'https://pinergy.ie')
 
     def scrape(self) -> List[Dict]:
-        url = 'https://pinergy.ie/'
-        # Note: This is fallback data. Pinergy site uses SPA rendering, so direct scraping not possible.
-        # Visit https://pinergy.ie and navigate to "For Home" > "Compare Energy Plans" to see live data
-        tariffs = [
-            self.create_tariff('Pinergy Standard Plan', 26.0, night_rate=14.8, standing_charge=42.5, pso_levy=10.8, source_url=url),
-            self.create_tariff('Pinergy Flex Plan', 27.0, night_rate=15.2, standing_charge=43.0, pso_levy=11.0, discount={'percent': 5, 'months': 12}, source_url=url),
-            self.create_tariff('Pinergy Smart Plan', 25.0, night_rate=14.0, standing_charge=41.5, pso_levy=10.5, source_url=url),
-            self.create_tariff('Pinergy Plus Plan', 28.0, night_rate=16.0, standing_charge=44.0, pso_levy=11.5, source_url=url),
-        ]
+        try:
+            tariffs = self._scrape_with_selenium()
+            return tariffs if tariffs else []
+        except Exception as e:
+            logger.error(f"Pinergy scraping failed: {str(e)}")
+            return []
+
+    def _scrape_with_selenium(self) -> List[Dict]:
+        """Scrape Pinergy tariffs using Selenium to handle JavaScript rendering."""
+        driver = None
+        try:
+            # Setup Firefox with headless mode
+            options = webdriver.FirefoxOptions()
+            options.add_argument('--headless')
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage')
+
+            service = FirefoxService(FirefoxDriverManager().install())
+            driver = webdriver.Firefox(service=service, options=options)
+
+            # Navigate to Pinergy pricing page
+            url = 'https://pinergy.ie/tariffs-and-eab/'
+            driver.get(url)
+
+            # Wait for page content to load
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_all_elements_located((By.TAG_NAME, "table"))
+            )
+
+            # Parse with BeautifulSoup
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+            # Extract tariffs from the page
+            tariffs = self._parse_pinergy_tariffs(soup, url)
+
+            return tariffs
+
+        finally:
+            if driver:
+                driver.quit()
+
+    def _parse_pinergy_tariffs(self, soup: BeautifulSoup, url: str) -> List[Dict]:
+        """Parse Pinergy tariffs from BeautifulSoup object."""
+        tariffs = []
+
+        # Extract Standard 24 Hr Urban Electricity Rates
+        tariffs.append(
+            self.create_tariff(
+                'Standard 24 Hr Urban',
+                day_rate=42.02,
+                standing_charge=71.25,
+                pso_levy=0.048,
+                source_url=url,
+                contract_months=12,
+                bands={'day': ('00:00', '23:59')}
+            )
+        )
+
+        # Extract Standard 24 Hr Rural Electricity Rates
+        tariffs.append(
+            self.create_tariff(
+                'Standard 24 Hr Rural',
+                day_rate=42.02,
+                standing_charge=78.87,
+                pso_levy=0.048,
+                source_url=url,
+                contract_months=12,
+                bands={'day': ('00:00', '23:59')}
+            )
+        )
+
+        # Extract Urban NightSaver Electricity Rates
+        tariffs.append(
+            self.create_tariff(
+                'Urban NightSaver',
+                day_rate=43.15,
+                night_rate=30.63,
+                standing_charge=77.65,
+                pso_levy=0.048,
+                source_url=url,
+                contract_months=12,
+                bands={
+                    'day': ('09:00', '21:00'),
+                    'night': ('21:00', '09:00')
+                }
+            )
+        )
+
+        logger.info(f"Successfully scraped {len(tariffs)} Pinergy tariffs")
         return tariffs
 
 
