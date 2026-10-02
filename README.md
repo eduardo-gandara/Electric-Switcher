@@ -1,92 +1,109 @@
 # Electric Switcher
 
-Sistema de análisis y simulación de tarifas eléctricas en Irlanda. Calcula cuánto pagarías con cada tarifa aplicándola a tu consumo real de 30 minutos, y te ayuda a decidir si cambiar de proveedor.
+Aplicación web para análisis y simulación de tarifas eléctricas en Irlanda. Carga tu consumo de ESB Networks, selecciona cómo extraer tarifas (Web Scraping o LLM), compara precios reales de proveedores y descubre cuánto ahorrarías con cada uno.
 
 ## 🎯 Características
 
-- **Motor de simulación**: Reproduce facturas reales con error ≤2% (validado contra 4 facturas)
+- **Interfaz web intuitiva**: Upload de CSV, selección de método, comparación visual
+- **Motor de simulación**: Reproduce facturas reales con error ≤0,33% (validado contra 4 facturas)
 - **Procesamiento de consumo**: Limpia CSV de ESB Networks, imputa huecos, detecta cambios de hora
-- **Recopilación de tarifas**: Extrae planes de proveedores irlandeses (Bord Gáis, Electric Ireland, Energia, etc.)
-- **Ranking inteligente**: Compara tarifas a 12 meses con sensibilidad a consumo (+20%, -20%)
-- **Asesor**: Identifica riesgos, supuestos y recomendaciones
+- **Doble método de recopilación**:
+  - 🌐 **Web Scraping**: Extrae tarifas de webs de proveedores con BeautifulSoup
+  - 🤖 **LLM (Gemini)**: Analiza páginas web con Google Gemini para extraer datos automáticamente
+- **Comparación visual**: Tabla de tarifas con costo anual a 12 meses
+- **Breakdown mensual**: Gráfico de desglose de costos mes a mes
+- **Fallback inteligente**: Usa datos demo si ambos métodos fallan
 
 ## 📋 Requisitos
 
 - Python 3.8+
+- Flask
 - pandas, numpy, requests, beautifulsoup4
+- google-generativeai (para método LLM)
 
 ```bash
 pip install -r requirements.txt
 ```
 
+**Variables de entorno** (para LLM Gemini):
+```bash
+export GEMINI_API_KEY="tu_api_key_aqui"
+```
+
 ## 🚀 Uso rápido
 
-### Modo demo
+### Iniciar servidor
 ```bash
-python src/main.py --demo
+python app.py
 ```
 
-### Con datos reales
-```bash
-python src/main.py --csv datos/consumo_esb.csv --tariffs config/tarifas.json
-```
+Abre `http://localhost:5000` en el navegador.
 
-### Pruebas de validación
-```bash
-python test_simulation.py
-```
+### Flujo de uso
+1. **Carga CSV** → Sube archivo de consumo (ESB Networks, últimos 24 meses)
+2. **Elige método** → Web Scraping o LLM Gemini para extraer tarifas
+3. **Revisa tarifas** → Tabla con planes de 6 proveedores
+4. **Compara costos** → Ranking anual + breakdown mensual
+5. **Decide** → Identifica mejor opción
 
 ## 📊 Arquitectura
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    CSV ESB Networks                         │
-│              (kWh cada 30 min, 24 meses)                    │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│            Agente: Analista de Consumo                      │
-│  - Limpia: duplicados, huecos (~0,2%), cambios de hora     │
-│  - Construye: perfil por banda (día/noche/pico) + hora     │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                         ▼
-┌──────────────────────────────────────────────────────┐
-│      Motor de Simulación (código determinista)      │
-│  - Aplica cada tarifa al perfil de 30 minutos       │
-│  - Calcula costo con IVA, descuentos, cargos        │
-│  - Validado: error ≤0,33% en 4 facturas reales      │
-└──────────────────────────┬───────────────────────────┘
-                           │
-          ┌────────────────┼────────────────┐
-          ▼                ▼                ▼
-    ┌──────────┐   ┌──────────┐      ┌──────────┐
-    │  Bord    │   │ Electric │      │ Energia  │
-    │  Gáis    │   │ Ireland  │      │    ...   │
-    │ €84-110  │   │ €78-105  │      │ €82-108  │
-    └──────────┘   └──────────┘      └──────────┘
-          │                │                │
-          └────────────────┼────────────────┘
-                           ▼
-        ┌──────────────────────────────────────┐
-        │    Agente: Asesor                    │
-        │ - Ranking por costo neto a 12 meses │
-        │ - Análisis de riesgo y supuestos     │
-        │ - Recomendaciones para usuario       │
-        └──────────────────────────────────────┘
-                           │
-                           ▼
-        ┌──────────────────────────────────────┐
-        │   El usuario decide                  │
-        │ - Cambiar de proveedor               │
-        │ - Mantener el actual                 │
-        └──────────────────────────────────────┘
+Frontend (HTML/CSS/JS)
+        │
+        ▼
+┌──────────────────────────────────────┐
+│   Flask API (app.py)                 │
+│ - POST /api/upload-csv               │
+│ - POST /api/collect-tariffs          │
+│ - GET /api/tariffs                   │
+└──────────┬───────────────────────────┘
+           │
+    ┌──────┴────────────────────┐
+    │                           │
+    ▼                           ▼
+CSV Processing             Tariff Collection
+- ESB Networks            ┌─────────────────┐
+- Limpieza                │ Método elegido  │
+- Imputation              ├─────────────────┤
+- Consumo 30 min          │🌐 Web Scraping  │
+                          │ (BeautifulSoup) │
+    │                     │                 │
+    │                     │🤖 LLM Gemini   │
+    │                     │ (Google GenAI)  │
+    └─────────┬───────────┴─────────────────┘
+              │
+              ▼
+    ┌──────────────────────────┐
+    │ Simulation Engine        │
+    │ (src/simulation_engine)  │
+    │ - Aplica tarifas        │
+    │ - Calcula costos        │
+    │ - IVA, descuentos, PSO  │
+    │ - Error ≤0,33%          │
+    └──────────┬───────────────┘
+               │
+               ▼
+    ┌──────────────────────────┐
+    │ Ranking y Visualización  │
+    │ - Tabla de tarifas       │
+    │ - Costo anual            │
+    │ - Breakdown mensual      │
+    │ - Comparativa            │
+    └──────────────────────────┘
 ```
 
 ## 🔧 Componentes
 
-### `src/simulation_engine.py`
+### **Backend**
+
+#### `app.py`
+Servidor Flask con endpoints REST:
+- `POST /api/upload-csv` — Procesa archivo ESB Networks
+- `POST /api/collect-tariffs` — Inicia recopilación (Web Scraping o LLM)
+- `GET /api/tariffs` — Devuelve tarifas y simulación
+
+#### `src/simulation_engine.py`
 Motor determinista (Python + pandas) que aplica tarifas a perfiles de consumo.
 
 **Validación**: 
@@ -95,59 +112,52 @@ Motor determinista (Python + pandas) que aplica tarifas a perfiles de consumo.
 - Agosto 2026: 111,67€ (error +0,01%)
 - Septiembre 2026: 85,19€ (error -0,33%)
 
-### `src/consumption_processor.py`
+#### `src/consumption_processor.py`
 Procesa CSV de ESB Networks: limpia duplicados, imputa huecos, ajusta cambios de hora DST.
 
-### `agents/tariff_collector.py`
-Busca en webs de proveedores irlandeses, extrae planes como registros JSON con URL y fecha.
+#### `agents/tariff_collector.py`
+Orquesta la recopilación de tarifas:
+- Enruta a Web Scraping o LLM según elección del usuario
+- Extrae planes como registros JSON con URL y fecha
+- Fallback a demo data si ambos métodos fallan
 
-### `agents/advisor.py`
-Presenta ranking, calcula ahorros, analiza sensibilidad, identifica riesgos.
+#### `agents/llm_scraper.py`
+Extrae tarifas usando Google Generative AI (Gemini):
+- Analiza URLs de proveedores
+- Extrae datos estructurados (tasas, cargos, descuentos)
+- Solo electricidad, no paquetes combinados
 
-### `src/main.py`
-Orquesta el pipeline completo: consumo → validación → simulación → informe.
+#### `agents/scrapers.py`
+Web Scraping con BeautifulSoup:
+- Consulta webs de proveedores
+- Parsea tablas de tarifas
+- Enriquece con metadata
+
+### **Frontend**
+
+#### `templates/index.html`
+Interfaz web responsiva:
+- Upload de CSV
+- Selección de método (Step 1.5)
+- Tabla de comparación
+- Breakdown mensual con gráficos
+- Detalles de tarifa expandibles
 
 ## 📈 Datos de entrada
 
 ### CSV (ESB Networks)
+Formato esperado:
 ```
 MPRN, Meter Serial Number | Read Value | Read Type | Read Date and End Time
 [meter_id]                 | [kWh]      | [tipo]    | dd-mm-yyyy hh:mm
 ```
 
-**Período**: 01/10/2024 a 30/09/2026 (24 meses)
-**Limpieza**: Duplicados eliminados, ~80 intervalos imputados, DST ajustado
-
-### Registro de tarifa (JSON)
-```json
-{
-  "supplier": "string",
-  "plan_name": "string",
-  "source_url": "https://...",
-  "extracted_at": "2026-10-01",
-  "contract_months": 12,
-  "unit_rates_c_per_kwh_ex_vat": {
-    "day": 38.16,
-    "night": 38.16,
-    "peak": 38.16
-  },
-  "bands": {
-    "night": ["21:00", "08:00"],
-    "peak": ["17:00", "19:00"],
-    "day": "rest"
-  },
-  "standing_charge_c_per_day": 61.52,
-  "pso_levy_eur_per_month": 1.46,
-  "discount": {
-    "percent": 32.0,
-    "applies_to": "consumption",
-    "months": 12
-  },
-  "cashback_eur": 0.0,
-  "exit_fee_eur": 0.0,
-  "conditions": ["direct_debit", "e_billing"]
-}
-```
+**Período**: Mínimo 24 meses de datos
+**Procesamiento**: 
+- Duplicados eliminados
+- Huecos imputados (~0,2%)
+- Cambios de hora (DST) ajustados automáticamente
+- Perfil de consumo por banda (día/noche/pico)
 
 ## 💰 Fórmula de coste
 
@@ -166,35 +176,135 @@ donde:
 - Peak (pico): 17:00-19:00 → solo lunes-viernes
 - Day (día): resto
 
+## ⚙️ Configuración
+
+### Proveedores soportados (6)
+```json
+{
+  "providers": [
+    {"name": "Bord Gáis Energy", "url": "https://www.bordgais.ie/"},
+    {"name": "Electric Ireland", "url": "https://www.electricireland.ie/"},
+    {"name": "SSE Airtricity", "url": "https://www.sseairtricity.com/"},
+    {"name": "Energia", "url": "https://www.energia.ie/"},
+    {"name": "Pinergy", "url": "https://www.pinergy.ie/"},
+    {"name": "Evoke Energy", "url": "https://www.evokeenergy.ie/"}
+  ]
+}
+```
+
+### Métodos de extracción
+
+**🌐 Web Scraping**
+- Usa BeautifulSoup para parsear HTML
+- Rápido pero frágil (cambios de estructura HTML rompen)
+- Mejor para: Tarifas simples en tablas
+
+**🤖 LLM Gemini**
+- Google Generative AI analiza páginas web
+- Robusto: entiende contexto, no depende de estructura HTML
+- Mejor para: Tarifas complejas, cambios frecuentes en webs
+- Requiere: `GEMINI_API_KEY`
+
+### Formato de tarifa extraída
+```json
+{
+  "supplier": "Bord Gáis Energy",
+  "plan_name": "Smart Tariff",
+  "source_url": "https://www.bordgais.ie/...",
+  "extracted_at": "2026-10-02T10:30:00",
+  "unit_rates_c_per_kwh_ex_vat": {
+    "day": 24.6,
+    "night": 13.8,
+    "peak": null
+  },
+  "standing_charge_c_per_day": 41.2,
+  "pso_levy_eur_per_month": 11.5,
+  "discount": {"percent": 15, "applies_to": "consumption"},
+  "cashback_eur": 50.0,
+  "exit_fee_eur": 0.0,
+  "contract_months": 12
+}
+```
+
 ## ✅ Criterios de éxito
 
-1. ✓ Motor reproduce 4 facturas reales con error ≤2% (actualmente ≤0,33%)
-2. ✓ Cada tarifa en ranking lleva URL y fecha de extracción
-3. ✓ Humano revisa mejores 3 opciones antes de decidir
+1. ✓ Motor reproduce 4 facturas reales con error ≤0,33%
+2. ✓ Extrae tarifas de 6 proveedores automáticamente (Web o LLM)
+3. ✓ Interfaz web intuitiva: upload → selección método → comparación
+4. ✓ Fallback a demo data si extracción falla
+5. ✓ Breakdown mensual con tabla clara (24 meses)
 
-## 🚨 Riesgos identificados
+## 🚨 Riesgos y limitaciones
 
 - **Descuentos de nuevo cliente**: Bajan del 32% al 28% tras primer año
-- **Datos desactualizados**: Verificar en web oficial si >7 días
-- **Cambios en el hogar**: EV, bomba de calor → recalcular
-- **Franjas inconsistentes**: Cada proveedor define bandas distintas
+- **Datos desactualizados**: Tarifas pueden cambiar, especialmente en mercado volátil
+- **LLM puede fallar**: Gemini extrae datos, pero puede perder campos en tarifas complejas
+- **Cambios en el hogar**: EV, bomba de calor → consumo diferente, requiere nuevo CSV
+- **Franjas inconsistentes**: Cada proveedor define bandas distintas (día/noche/pico)
+- **Web Scraping frágil**: Cambios en estructura HTML rompen parseo
+- **Validación limitada**: Fallback a demo data si ambos métodos fallan (datos ficticios)
 
 ## 📋 Plan de construcción (fases)
 
 - ✅ **Fase 0**: Base validada. CSV + 4 facturas procesadas
 - ✅ **Fase 1**: Motor reutilizable. Esquema JSON + tarifa actual
-- ⏳ **Fase 2**: Agente recopilador. Búsqueda web de proveedores
-- ⏳ **Fase 3**: Ranking y asesor. Simulación + análisis de riesgo
-- ⏳ **Fase 4**: Versión 2. Escenarios de consumo (EV, bomba de calor)
-- ⏳ **Fase 5**: Presentación. Slide + demostración interactiva
+- ✅ **Fase 2**: Recopilador web + LLM. Selección de método (Web Scraping vs Gemini), extracción automática de 6 proveedores, fallback a demo data
+- ⏳ **Fase 3**: Ranking y asesor. Análisis de riesgo, sensibilidad a consumo (+/-20%), recomendaciones personalizadas
+- ⏳ **Fase 4**: Persistencia. Base de datos de tarifas, histórico de cambios, caché inteligente
+- ⏳ **Fase 5**: Versión 2.0. Escenarios (EV, bomba de calor), notificaciones, API pública
 
-## 🤔 Próximas mejoras
+## 🤔 Próximas mejoras (Fase 3+)
 
-- [ ] Extracción automatizada de tarifas desde webs
+- [ ] Análisis de sensibilidad (impacto de +/-20% consumo)
+- [ ] Recomendaciones personalizadas por riesgo
+- [ ] Base de datos de tarifas (persistencia)
+- [ ] Histórico de cambios de tarifas
+- [ ] Notificaciones de cambios significativos
+- [ ] API REST pública
 - [ ] Escenarios de consumo futuro (EV, energías renovables)
-- [ ] Comparación con otros usuarios
-- [ ] Notificaciones de cambios de tarifa
-- [ ] Integración con APIs de proveedores
+- [ ] Exportar a PDF/Excel
+- [ ] Autenticación de usuarios
+- [ ] Dashboard personal
+
+## 🔄 Desarrollo
+
+### Estructura de directorios
+```
+Electric-Switcher/
+├── app.py                      # Servidor Flask
+├── templates/
+│   └── index.html             # Interfaz web
+├── src/
+│   ├── simulation_engine.py   # Motor de cálculo
+│   ├── consumption_processor.py
+│   └── main.py                # CLI (legacy)
+├── agents/
+│   ├── tariff_collector.py    # Orquestador
+│   ├── llm_scraper.py         # Gemini API
+│   └── scrapers.py            # BeautifulSoup
+├── config/
+│   └── providers.json         # Configuración de proveedores
+├── uploads/                   # CSV subidos
+└── data/
+    └── demo_tariffs.json      # Datos fallback
+```
+
+### Cómo extender
+
+**Agregar nuevo proveedor**: Edita `config/providers.json` + implanta scraper en `agents/scrapers.py`
+
+**Mejorar LLM**: Modifica prompt en `agents/llm_scraper.py:_extract_tariffs_with_llm()`
+
+**Cambiar interfaz**: Edita `templates/index.html` (HTML/CSS/JS) + endpoints en `app.py`
+
+### Testing
+```bash
+# Simulación con datos demo
+python src/main.py --demo
+
+# Con CSV real
+python src/main.py --csv data/consumo_esb.csv --method=llm
+```
 
 ## 📝 Licencia
 
@@ -203,3 +313,4 @@ Ejercicio de demostración para entender AI agents de punta a punta.
 ## 👤 Autor
 
 Eduardo Gándara (2026)
+Co-authored with Claude Haiku 4.5

@@ -327,9 +327,12 @@ def demo_simulate():
 
 @app.route('/api/collect-tariffs', methods=['POST'])
 def collect_tariffs():
-    """Run tariff collector agent."""
+    """Run tariff collector agent with selected method."""
     try:
-        collector = TariffCollector()
+        data = request.get_json() or {}
+        method = data.get('method', 'webscraping')  # 'webscraping' or 'llm'
+
+        collector = TariffCollector(method=method)
         collected, rejected = collector.collect_all()
 
         # Convert to JSON-serializable format
@@ -346,6 +349,7 @@ def collect_tariffs():
 
         return jsonify({
             'success': True,
+            'method': method,
             'report': collector.get_report(),
             'tariffs': collected_dicts,
             'rejected': rejected_dicts,

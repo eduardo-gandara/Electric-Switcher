@@ -71,10 +71,11 @@ class RejectedTariff:
 class TariffCollector:
     """Collects electricity tariffs from Irish providers."""
 
-    def __init__(self):
+    def __init__(self, method: str = 'webscraping'):
         self.collected_tariffs: List[CollectedTariff] = []
         self.rejected_tariffs: List[RejectedTariff] = []
         self.extraction_timestamp = datetime.now().isoformat()
+        self.method = method  # 'webscraping' or 'llm'
 
         # Load official providers from configuration
         config = load_providers_config()
@@ -86,37 +87,41 @@ class TariffCollector:
     def collect_all(self) -> Tuple[List[CollectedTariff], List[RejectedTariff]]:
         """
         Collect tariffs from all official providers.
-        Uses web scrapers for real data, falls back to demo if scraping unavailable.
+        Method selected: 'webscraping' or 'llm'
         Returns (collected_tariffs, rejected_tariffs)
         """
-        # Try web scraping first
-        if get_all_scrapers:
-            logger.info("🌐 Starting web scraping...\n")
-            self._scrape_providers()
+        if self.method == 'llm':
+            logger.info("🤖 Starting LLM-based tariff extraction...\n")
+            self._scrape_providers_llm()
         else:
-            logger.warning("Scrapers not available, using demo data")
-            self._add_demo_tariffs()
-        
+            # Default to web scraping
+            if get_all_scrapers:
+                logger.info("🌐 Starting web scraping...\n")
+                self._scrape_providers()
+            else:
+                logger.warning("Scrapers not available, using demo data")
+                self._add_demo_tariffs()
+
         # If no tariffs collected, use demo
         if not self.collected_tariffs:
             logger.info("No tariffs scraped, using demo data as fallback")
             self._add_demo_tariffs()
-        
+
         return self.collected_tariffs, self.rejected_tariffs
     
     def _scrape_providers(self):
         """Run web scrapers for all providers."""
         if not get_all_scrapers:
             return
-        
+
         try:
             scrapers = get_all_scrapers()
-            
+
             for scraper in scrapers:
                 try:
                     logger.info(f"Scraping {scraper.provider_name}...")
                     tariffs_data = scraper.scrape()
-                    
+
                     for tariff_dict in tariffs_data:
                         # Validate tariff
                         tariff = CollectedTariff(
@@ -134,7 +139,7 @@ class TariffCollector:
                             bands=tariff_dict.get('bands'),
                             conditions=tariff_dict.get('conditions', [])
                         )
-                        
+
                         # Validate and collect
                         valid, issues = self.validate_tariff_completeness(tariff)
                         if valid:
@@ -147,18 +152,75 @@ class TariffCollector:
                                 ', '.join(issues),
                                 tariff.source_url
                             )
-                    
+
                     if tariffs_data:
                         logger.info(f"  ✓ {len(tariffs_data)} tariff(s) from {scraper.provider_name}\n")
                     else:
                         logger.info(f"  ⚠️  No tariffs found\n")
-                
+
                 except Exception as e:
                     logger.error(f"Error scraping {scraper.provider_name}: {e}")
                     continue
-        
+
         except Exception as e:
             logger.error(f"Web scraping failed: {e}")
+
+    def _scrape_providers_llm(self):
+        """Run LLM-based tariff extraction for all providers."""
+        try:
+            from agents.llm_scraper import get_llm_scrapers
+
+            scrapers = get_llm_scrapers()
+
+            for scraper in scrapers:
+                try:
+                    logger.info(f"Extracting {scraper.provider_name} via LLM...")
+                    tariffs_data = scraper.scrape()
+
+                    for tariff_dict in tariffs_data:
+                        # Validate tariff
+                        tariff = CollectedTariff(
+                            supplier=tariff_dict['supplier'],
+                            plan_name=tariff_dict['plan_name'],
+                            source_url=tariff_dict['source_url'],
+                            extracted_at=tariff_dict['extracted_at'],
+                            unit_rates_c_per_kwh_ex_vat=tariff_dict['unit_rates_c_per_kwh_ex_vat'],
+                            standing_charge_c_per_day=tariff_dict.get('standing_charge_c_per_day'),
+                            pso_levy_eur_per_month=tariff_dict.get('pso_levy_eur_per_month'),
+                            discount=tariff_dict.get('discount'),
+                            cashback_eur=tariff_dict.get('cashback_eur', 0.0),
+                            exit_fee_eur=tariff_dict.get('exit_fee_eur', 0.0),
+                            contract_months=tariff_dict.get('contract_months'),
+                            bands=tariff_dict.get('bands'),
+                            conditions=tariff_dict.get('conditions', [])
+                        )
+
+                        # Validate and collect
+                        valid, issues = self.validate_tariff_completeness(tariff)
+                        if valid:
+                            self.collected_tariffs.append(tariff)
+                            logger.info(f"  ✓ Added: {tariff.plan_name}")
+                        else:
+                            self.reject_tariff(
+                                tariff.supplier,
+                                tariff.plan_name,
+                                ', '.join(issues),
+                                tariff.source_url
+                            )
+
+                    if tariffs_data:
+                        logger.info(f"  ✓ {len(tariffs_data)} tariff(s) from {scraper.provider_name}\n")
+                    else:
+                        logger.info(f"  ⚠️  No tariffs found\n")
+
+                except Exception as e:
+                    logger.error(f"Error extracting {scraper.provider_name} via LLM: {e}")
+                    continue
+
+        except ImportError:
+            logger.error("LLM scraper module not available")
+        except Exception as e:
+            logger.error(f"LLM-based scraping failed: {e}")
     
     def _add_demo_tariffs(self):
         """Add demo tariffs as fallback."""
