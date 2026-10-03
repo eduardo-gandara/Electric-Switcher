@@ -200,6 +200,21 @@ class SimulationEngine:
         total_cost = 0.0
         total_consumption = 0.0
 
+        # Filter to only include complete months (with full month's data)
+        complete_months = []
+        for month in months:
+            month_str = str(month)
+            # Get actual data count for this month
+            month_data = self.profile.df[self.profile.df['timestamp'].dt.to_period('M') == month]
+            expected_readings = month.days_in_month * 48  # 48 readings per day (30-min intervals)
+            actual_readings = len(month_data)
+
+            # Only include if we have at least 95% of expected data (nearly complete month)
+            if actual_readings >= int(expected_readings * 0.95):
+                complete_months.append(month)
+
+        months = complete_months
+
         for month in months:
             month_str = str(month)
 
