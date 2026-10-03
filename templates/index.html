@@ -597,18 +597,19 @@
                     );
 
                     return {
-                    plan_name: result.plan_name,
-                    supplier: result.supplier,
-                    annual_cost: result.total_cost_eur,
-                    monthly_costs: monthlyCosts,
-                    unit_rates_c_per_kwh_ex_vat: result.unit_rates_c_per_kwh_ex_vat || {},
-                    standing_charge_c_per_day: result.standing_charge_c_per_day || 0,
-                    discount: result.discount || {},
-                    exit_fee_eur: result.exit_fee_eur || 0,
-                    cashback_eur: result.cashback_eur || 0,
-                    source_url: result.source_url || '',
-                    conditions: result.conditions || []
-                }));
+                        plan_name: result.plan_name,
+                        supplier: result.supplier,
+                        annual_cost: result.total_cost_eur,
+                        monthly_costs: monthlyCosts,
+                        unit_rates_c_per_kwh_ex_vat: result.unit_rates_c_per_kwh_ex_vat || {},
+                        standing_charge_c_per_day: result.standing_charge_c_per_day || 0,
+                        discount: result.discount || {},
+                        exit_fee_eur: result.exit_fee_eur || 0,
+                        cashback_eur: result.cashback_eur || 0,
+                        source_url: result.source_url || '',
+                        conditions: result.conditions || []
+                    };
+                });
 
                 const response = await fetch('/api/analyze-tariffs', {
                     method: 'POST',
