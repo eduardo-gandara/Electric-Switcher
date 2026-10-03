@@ -33,7 +33,14 @@ class TariffRecord:
     def from_dict(cls, data: dict) -> 'TariffRecord':
         """Crear desde diccionario JSON."""
         rates = data.get('unit_rates_c_per_kwh_ex_vat', {})
-        rates = {k: (v or 0.0) for k, v in rates.items()}
+        # Normalize rates: if a band is None, use day rate (for 24h uniform tariffs)
+        day_rate = rates.get('day') or 0.0
+        rates = {k: (v if v is not None else day_rate) for k, v in rates.items()}
+        # Ensure all bands exist
+        if 'night' not in rates:
+            rates['night'] = day_rate
+        if 'peak' not in rates:
+            rates['peak'] = day_rate
 
         return cls(
             supplier=data.get('supplier'),
