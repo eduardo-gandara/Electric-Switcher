@@ -24,7 +24,7 @@ class ScenarioProfileGenerator:
         end_month: str,
         annual_km: float,
         consumption_kwh_per_100km: float,
-        charging_hours: str  # '20:00-08:00' or '09:00-17:00'
+        charging_hours  # '20:00-08:00' or '09:00-17:00'
     ) -> pd.DataFrame:
         """
         Generate consumption profile for electric vehicle charging.
@@ -41,6 +41,7 @@ class ScenarioProfileGenerator:
         """
         # Parse charging hours
         try:
+            charging_hours = str(charging_hours)  # Ensure it's a string
             start_hour_str, end_hour_str = charging_hours.split('-')
             start_hour = int(start_hour_str.split(':')[0])
             end_hour = int(end_hour_str.split(':')[0])
@@ -101,7 +102,7 @@ class ScenarioProfileGenerator:
         start_month: str,
         end_month: str,
         annual_heating_kwh: float,
-        heating_months_str: str  # '10,11,12,1,2,3,4'
+        heating_months_str  # '10,11,12,1,2,3,4' or list
     ) -> pd.DataFrame:
         """
         Generate consumption profile for heat pump.
@@ -115,7 +116,11 @@ class ScenarioProfileGenerator:
         Returns:
             DataFrame with columns [timestamp, kwh, band]
         """
-        heating_months = set(int(m) for m in heating_months_str.split(','))
+        # Handle both string and number inputs
+        if isinstance(heating_months_str, (int, float)):
+            heating_months_str = str(int(heating_months_str))
+
+        heating_months = set(int(m.strip()) for m in str(heating_months_str).split(','))
 
         start = pd.Period(start_month, 'M')
         end = pd.Period(end_month, 'M')
@@ -161,7 +166,7 @@ class ScenarioProfileGenerator:
         start_month: str,
         end_month: str,
         annual_production_kwh: float,
-        peak_hours: str  # '08:00-16:00'
+        peak_hours  # '08:00-16:00'
     ) -> pd.DataFrame:
         """
         Generate negative consumption (production) profile for solar panels.
@@ -176,6 +181,7 @@ class ScenarioProfileGenerator:
             DataFrame with columns [timestamp, kwh, band]
         """
         try:
+            peak_hours = str(peak_hours)  # Ensure it's a string
             start_hour_str, end_hour_str = peak_hours.split('-')
             peak_start = int(start_hour_str.split(':')[0])
             peak_end = int(end_hour_str.split(':')[0])
