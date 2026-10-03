@@ -33,11 +33,11 @@ class LLMScraperBase:
             api_key = os.getenv('GEMINI_API_KEY')
             if api_key:
                 genai.configure(api_key=api_key)
-                # Try to use gemini-2.5-flash (proven to work with tariff extraction)
+                # Use gemini-3.8-flash (latest recommended model)
                 self.model = None
                 try:
-                    self.model = genai.GenerativeModel('models/gemini-2.5-flash')
-                    logger.info(f"✅ Using model: gemini-2.5-flash")
+                    self.model = genai.GenerativeModel('models/gemini-3.8-flash')
+                    logger.info(f"✅ Using model: gemini-3.8-flash")
                 except Exception as e:
                     logger.warning(f"gemini-2.5-flash not available: {e}, falling back to first available model...")
                     try:
