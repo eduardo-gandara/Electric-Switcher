@@ -73,7 +73,9 @@
       "Bash(git commit -m 'refactor: simplify UI - show only ranking with monthly breakdown in English *)",
       "Bash(git commit -m 'fix: translate recommendation to English and improve monthly breakdown table *)",
       "Bash(git commit -m 'clarify: show actual period \\(not just '\\\\''/year'\\\\''\\) for total cost *)",
-      "Bash(git commit -m 'improve: only use complete months \\(95%+ data\\) in calculations *)"
+      "Bash(git commit -m 'improve: only use complete months \\(95%+ data\\) in calculations *)",
+      "Bash(git commit -m 'change: show annualized cost \\(12 months\\) instead of actual period *)",
+      "Bash(git commit -m 'feature: add economic breakdown in details modal *)"
     ]
   }
 }

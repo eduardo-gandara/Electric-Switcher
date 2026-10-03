@@ -742,10 +742,31 @@
             const item = analysis.ranking[rankIndex];
             const tariff = item.tariff;
             const risks = item.risks;
+            const monthlyCosts = item.sensitivity_detailed.base || [];
+
+            // Calculate average monthly breakdown from first complete month
+            let avgMonthBreakdown = null;
+            if (window.comparisonResults && window.comparisonResults[rankIndex]) {
+                const result = window.comparisonResults[rankIndex];
+                if (result.monthly_breakdown && result.monthly_breakdown.length > 0) {
+                    const firstMonth = result.monthly_breakdown[0];
+                    avgMonthBreakdown = {
+                        consumption_day: firstMonth.consumption_by_band?.day || 0,
+                        consumption_night: firstMonth.consumption_by_band?.night || 0,
+                        consumption_peak: firstMonth.consumption_by_band?.peak || 0,
+                        consumption_cost: (firstMonth.consumption_cost_c || 0) / 100,
+                        standing_charge: (firstMonth.standing_charge_c || 0) / 100,
+                        pso_levy: (firstMonth.pso_levy_c || 0) / 100,
+                        discount: (firstMonth.discount_amount_c || 0) / 100,
+                        iva: (firstMonth.iva_amount_c || 0) / 100,
+                        total: firstMonth.total_eur || 0
+                    };
+                }
+            }
 
             let riskHtml = '';
             if (risks.risks.length > 0) {
-                riskHtml = '<h4 style="margin: 15px 0 10px 0; color: var(--primary);">⚠️ Riesgos identificados:</h4>';
+                riskHtml = '<h4 style="margin: 15px 0 10px 0; color: var(--primary);">⚠️ Identified Risks:</h4>';
                 risks.risks.forEach(r => {
                     riskHtml += `
                         <div style="background: var(--gray-50); padding: 12px; border-left: 4px solid var(--warning); margin-bottom: 10px; border-radius: 4px;">
@@ -756,32 +777,60 @@
                 });
             }
 
+            let breakdownHtml = '';
+            if (avgMonthBreakdown) {
+                breakdownHtml = `
+                    <h4 style="color: var(--primary); margin-bottom: 10px;">💶 Average Monthly Breakdown</h4>
+                    <div style="background: var(--gray-50); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em;">
+                            <div style="border-right: 1px solid var(--gray-200); padding-right: 10px;">
+                                <p style="margin: 0 0 8px 0; color: var(--gray-600); font-weight: 600;">Consumption (kWh)</p>
+                                ${avgMonthBreakdown.consumption_day > 0 ? `<p style="margin: 2px 0;">Day: ${avgMonthBreakdown.consumption_day.toFixed(0)} kWh</p>` : ''}
+                                ${avgMonthBreakdown.consumption_night > 0 ? `<p style="margin: 2px 0;">Night: ${avgMonthBreakdown.consumption_night.toFixed(0)} kWh</p>` : ''}
+                                ${avgMonthBreakdown.consumption_peak > 0 ? `<p style="margin: 2px 0;">Peak: ${avgMonthBreakdown.consumption_peak.toFixed(0)} kWh</p>` : ''}
+                            </div>
+                            <div style="padding-left: 10px;">
+                                <p style="margin: 0 0 8px 0; color: var(--gray-600); font-weight: 600;">Cost Components</p>
+                                <p style="margin: 2px 0;">Consumption: €${avgMonthBreakdown.consumption_cost.toFixed(2)}</p>
+                                <p style="margin: 2px 0;">Standing Charge: €${avgMonthBreakdown.standing_charge.toFixed(2)}</p>
+                                <p style="margin: 2px 0;">PSO Levy: €${avgMonthBreakdown.pso_levy.toFixed(2)}</p>
+                                ${avgMonthBreakdown.discount > 0 ? `<p style="margin: 2px 0; color: var(--success);">Discount: -€${avgMonthBreakdown.discount.toFixed(2)}</p>` : ''}
+                                <p style="margin: 8px 0 0 0; font-weight: 600; border-top: 1px solid var(--gray-300); padding-top: 8px;">VAT (9%): €${avgMonthBreakdown.iva.toFixed(2)}</p>
+                                <p style="margin: 8px 0 0 0; font-size: 1.1em; font-weight: bold; color: var(--primary);">Total: €${avgMonthBreakdown.total.toFixed(2)}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
             const modal = document.createElement('div');
             modal.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; overflow-y: auto;';
             modal.innerHTML = `
-                <div style="background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%; margin: 20px; max-height: 90vh; overflow-y: auto;">
+                <div style="background: white; padding: 30px; border-radius: 12px; max-width: 650px; width: 90%; margin: 20px; max-height: 90vh; overflow-y: auto;">
                     <button onclick="this.closest('div').parentElement.remove()" style="float: right; background: none; border: none; font-size: 1.8em; cursor: pointer; color: var(--gray-500);">×</button>
                     <h2 style="margin-top: 0; color: var(--primary);">${tariff.plan_name}</h2>
                     <p style="color: var(--gray-700); margin: 10px 0 20px 0; font-size: 1.1em;">${tariff.supplier}</p>
 
                     <div style="background: var(--gray-50); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                        <p style="margin: 0; font-size: 0.9em; color: var(--gray-700);">Costo anual</p>
-                        <p style="margin: 5px 0 0 0; font-size: 1.8em; font-weight: bold; color: var(--primary);">€${item.annual_cost.toFixed(2)}</p>
+                        <p style="margin: 0; font-size: 0.9em; color: var(--gray-700);">Annual Cost</p>
+                        <p style="margin: 5px 0 0 0; font-size: 1.8em; font-weight: bold; color: var(--primary);">€${item.annual_cost.toFixed(2)}/year</p>
                     </div>
 
-                    <h4 style="color: var(--primary); margin-bottom: 10px;">📈 Sensibilidad a consumo</h4>
+                    ${breakdownHtml}
+
+                    <h4 style="color: var(--primary); margin-bottom: 10px;">📈 Sensitivity to Consumption Changes</h4>
                     <p style="margin: 0 0 15px 0; font-size: 0.9em;">
-                        Costo si tu consumo cambia:<br>
+                        Annual cost if your consumption changes:<br>
                         <strong>-20%:</strong> €${item.sensitivity.low_20_annual.toFixed(2)}<br>
                         <strong>Base:</strong> €${item.sensitivity.base_annual.toFixed(2)}<br>
                         <strong>+20%:</strong> €${item.sensitivity.high_20_annual.toFixed(2)}<br>
-                        <strong style="color: var(--warning);">Rango:</strong> €${item.sensitivity.variance.toFixed(2)}
+                        <strong style="color: var(--warning);">Range:</strong> €${item.sensitivity.variance.toFixed(2)}
                     </p>
 
                     ${riskHtml}
 
                     <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--gray-200);">
-                        <a href="${tariff.source_url}" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 500;">🔗 Ver en sitio oficial</a>
+                        <a href="${tariff.source_url}" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 500;">🔗 View on provider website</a>
                     </div>
                 </div>
             `;
