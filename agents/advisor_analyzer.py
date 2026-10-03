@@ -221,15 +221,15 @@ class AdvisorRecommender:
             reasoning.append(f"Ahorra €{savings:.2f} vs. siguiente opción")
 
         recommendation_text = (
-            f"Recomendamos **{best['tariff']['plan_name']}** de "
+            f"We recommend **{best['tariff']['plan_name']}** from "
             f"**{best['tariff']['supplier']}**. "
-            f"Es la opción más económica a 12 meses (€{best['annual_cost']:.2f}), "
-            f"y presenta un buen balance entre costo y estabilidad. "
+            f"It's the most economical option over 12 months (€{best['annual_cost']:.2f}) "
+            f"and offers a good balance between cost and stability. "
         )
 
         if risks.get("count", 0) > 0:
             recommendation_text += (
-                f"Nota: Identifica {risks.get('count')} riesgos a revisar antes de cambiar."
+                f"Note: {risks.get('count')} risk(s) identified - review before switching."
             )
 
         return {

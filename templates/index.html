@@ -680,12 +680,14 @@
 
                         <div style="margin-bottom: 15px;">
                             <p style="margin: 0 0 10px 0; font-size: 0.9em; font-weight: 600; color: var(--gray-600);">24-Month Cost Breakdown</p>
-                            <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-bottom: 10px;">
+                            <div style="display: grid; grid-template-columns: 1fr; gap: 2px; max-height: 200px; overflow-y: auto; border: 1px solid var(--gray-200); border-radius: 6px;">
                                 ${monthlyCosts.map((cost, m) => {
                                     const percent = (cost / maxCost) * 100;
-                                    return `<div style="text-align: center;">
-                                        <div style="background: var(--primary); opacity: ${0.4 + (percent / 100) * 0.6}; height: 30px; border-radius: 4px; margin-bottom: 4px;"></div>
-                                        <small style="font-size: 0.7em; color: var(--gray-600);">€${cost.toFixed(0)}</small>
+                                    const month = new Date(2024, 9 + m, 1).toLocaleString('en-US', {month: 'short', year: '2-digit'});
+                                    return `<div style="display: grid; grid-template-columns: 50px 1fr 60px; gap: 8px; align-items: center; padding: 6px 12px; background: ${m % 2 === 0 ? 'var(--gray-50)' : 'white'}; border-bottom: 1px solid var(--gray-100);">
+                                        <small style="font-weight: 600; color: var(--gray-600);">${month}</small>
+                                        <div style="background: linear-gradient(90deg, var(--primary) ${percent}%, transparent ${percent}%); height: 20px; border-radius: 4px;"></div>
+                                        <small style="font-weight: 600; color: var(--primary);">€${cost.toFixed(0)}</small>
                                     </div>`;
                                 }).join('')}
                             </div>

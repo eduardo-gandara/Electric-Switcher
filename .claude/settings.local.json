@@ -69,7 +69,9 @@
       "Bash(curl -s -X POST -F \"file=@/tmp/test.csv\" http://localhost:5000/api/upload-csv)",
       "Bash(node -c templates/index.html)",
       "Bash(curl -s http://localhost:5000)",
-      "Bash(git commit -m 'fix: correct JavaScript syntax error in analyzeCollectedTariffs *)"
+      "Bash(git commit -m 'fix: correct JavaScript syntax error in analyzeCollectedTariffs *)",
+      "Bash(git commit -m 'refactor: simplify UI - show only ranking with monthly breakdown in English *)",
+      "Bash(git commit -m 'fix: translate recommendation to English and improve monthly breakdown table *)"
     ]
   }
 }
