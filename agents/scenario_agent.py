@@ -192,3 +192,16 @@ class ScenarioAgent:
                 f"{answers['working_days_per_week']} days/week"
             )
         return "Unknown scenario"
+
+    def generate_combined_summary(self, scenarios_with_answers: List[Dict]) -> str:
+        """Generate summary for combined scenarios"""
+        summaries = []
+        total_additional_kwh = 0
+
+        for scenario_data in scenarios_with_answers:
+            scenario_id = scenario_data['scenario_id']
+            answers = scenario_data['answers']
+            summary = self.generate_scenario_summary(scenario_id, answers)
+            summaries.append(summary)
+
+        return " + ".join(summaries)

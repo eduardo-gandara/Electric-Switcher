@@ -502,8 +502,9 @@ def scenario_validate():
 @app.route('/api/scenario-simulation', methods=['POST'])
 def scenario_simulation():
     """
-    Phase 4: Run simulation comparing base consumption vs. consumption with scenario.
+    Phase 4: Run simulation comparing base consumption vs. consumption with scenario(s).
     Returns two rankings side-by-side.
+    Supports multiple scenarios combined (e.g., EV + Heat Pump + Remote Work).
     """
     try:
         data = request.get_json() or {}
@@ -511,11 +512,17 @@ def scenario_simulation():
         # Parameters
         csv_filename = data.get('csv_filename', '')
         tariffs_data = data.get('tariffs', [])
-        scenario_id = data.get('scenario_id', 'electric_vehicle')
-        scenario_answers = data.get('scenario_answers', {})
+        scenarios_list = data.get('scenarios', [])  # List of {scenario_id, answers}
 
-        if not csv_filename or not tariffs_data:
-            return jsonify({'success': False, 'error': 'Missing csv_filename or tariffs'}), 400
+        # Support old single-scenario API for backward compatibility
+        if not scenarios_list and data.get('scenario_id'):
+            scenarios_list = [{
+                'scenario_id': data.get('scenario_id'),
+                'answers': data.get('scenario_answers', {})
+            }]
+
+        if not csv_filename or not tariffs_data or not scenarios_list:
+            return jsonify({'success': False, 'error': 'Missing csv_filename, tariffs, or scenarios'}), 400
 
         # Load CSV
         csv_path = UPLOAD_FOLDER / csv_filename
@@ -544,45 +551,17 @@ def scenario_simulation():
         if not start_month or not end_month:
             return jsonify({'success': False, 'error': 'Invalid date range in CSV'}), 400
 
-        # Generate scenario profile
+        # Generate combined scenario profile
         generator = ScenarioProfileGenerator()
         base_consumption_kwh = profile_df['kwh'].sum()
 
-        if scenario_id == 'electric_vehicle':
-            scenario_df = generator.generate_electric_vehicle_profile(
-                start_month,
-                end_month,
-                scenario_answers.get('annual_km', 12000),
-                scenario_answers.get('consumption_kwh_per_100km', 17),
-                scenario_answers.get('charging_hours', '20:00-08:00')
-            )
-        elif scenario_id == 'heat_pump':
-            scenario_df = generator.generate_heat_pump_profile(
-                start_month,
-                end_month,
-                scenario_answers.get('annual_heating_kwh', 4000),
-                scenario_answers.get('heating_months', '10,11,12,1,2,3,4')
-            )
-        elif scenario_id == 'solar_panels':
-            scenario_df = generator.generate_solar_panels_profile(
-                start_month,
-                end_month,
-                scenario_answers.get('annual_production_kwh', 3000),
-                scenario_answers.get('peak_hours', '08:00-16:00')
-            )
-        elif scenario_id == 'remote_work':
-            scenario_df = generator.generate_remote_work_profile(
-                start_month,
-                end_month,
-                base_consumption_kwh,
-                scenario_answers.get('additional_consumption_percent', 15),
-                scenario_answers.get('working_days_per_week', 5)
-            )
-        else:
-            return jsonify({'success': False, 'error': f'Unknown scenario: {scenario_id}'}), 400
-
-        # Combine profiles
-        combined_df = generator.combine_profiles(profile_df, scenario_df)
+        combined_df = generator.combine_multiple_scenarios(
+            profile_df,
+            start_month,
+            end_month,
+            base_consumption_kwh,
+            scenarios_list
+        )
         combined_consumption_profile = ConsumptionProfile(combined_df)
 
         # Run simulations
@@ -612,15 +591,20 @@ def scenario_simulation():
 
         # Generate scenario summary
         agent = ScenarioAgent()
-        scenario_summary = agent.generate_scenario_summary(scenario_id, scenario_answers)
+        scenario_summary = agent.generate_combined_summary(scenarios_list)
 
         return jsonify({
             'success': True,
-            'scenario_id': scenario_id,
+            'scenarios_count': len(scenarios_list),
+            'scenarios': [s['scenario_id'] for s in scenarios_list],
             'scenario_summary': scenario_summary,
             'base_consumption_kwh': round(base_consumption_kwh, 2),
             'scenario_consumption_kwh': round(combined_df['kwh'].sum(), 2),
             'consumption_change_kwh': round(combined_df['kwh'].sum() - base_consumption_kwh, 2),
+            'consumption_change_percent': round(
+                ((combined_df['kwh'].sum() - base_consumption_kwh) / base_consumption_kwh * 100) if base_consumption_kwh > 0 else 0,
+                1
+            ),
             'ranking_base': results_base,
             'ranking_scenario': results_scenario,
             'comparison': {

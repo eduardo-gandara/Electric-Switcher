@@ -288,21 +288,25 @@
                     What if your consumption changes? Explore scenarios like adding an electric vehicle, heat pump, solar panels, or remote work.
                 </p>
 
-                <!-- Scenario Selection -->
-                <h3 style="margin-top: 20px; margin-bottom: 15px;">Select a Scenario:</h3>
+                <!-- Scenario Selection (Multiple) -->
+                <h3 style="margin-top: 20px; margin-bottom: 15px;">Select One or More Scenarios:</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px;">
-                    <div class="provider-btn" onclick="selectScenario('electric_vehicle')" id="scenario-electric_vehicle">
-                        🚗 Electric Vehicle
-                    </div>
-                    <div class="provider-btn" onclick="selectScenario('heat_pump')" id="scenario-heat_pump">
-                        🔥 Heat Pump
-                    </div>
-                    <div class="provider-btn" onclick="selectScenario('solar_panels')" id="scenario-solar_panels">
-                        ☀️ Solar Panels
-                    </div>
-                    <div class="provider-btn" onclick="selectScenario('remote_work')" id="scenario-remote_work">
-                        💻 Remote Work
-                    </div>
+                    <label style="display: flex; align-items: center; padding: 15px; background: var(--gray-50); border: 2px solid var(--gray-200); border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                        <input type="checkbox" id="scenario-electric_vehicle" value="electric_vehicle" class="scenario-checkbox" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                        <span style="flex: 1; font-weight: 600;">🚗 Electric Vehicle</span>
+                    </label>
+                    <label style="display: flex; align-items: center; padding: 15px; background: var(--gray-50); border: 2px solid var(--gray-200); border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                        <input type="checkbox" id="scenario-heat_pump" value="heat_pump" class="scenario-checkbox" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                        <span style="flex: 1; font-weight: 600;">🔥 Heat Pump</span>
+                    </label>
+                    <label style="display: flex; align-items: center; padding: 15px; background: var(--gray-50); border: 2px solid var(--gray-200); border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                        <input type="checkbox" id="scenario-solar_panels" value="solar_panels" class="scenario-checkbox" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                        <span style="flex: 1; font-weight: 600;">☀️ Solar Panels</span>
+                    </label>
+                    <label style="display: flex; align-items: center; padding: 15px; background: var(--gray-50); border: 2px solid var(--gray-200); border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                        <input type="checkbox" id="scenario-remote_work" value="remote_work" class="scenario-checkbox" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                        <span style="flex: 1; font-weight: 600;">💻 Remote Work</span>
+                    </label>
                 </div>
 
                 <!-- Scenario Questions Form -->
@@ -1055,116 +1059,169 @@
             if (e.target === document.getElementById('detailsModal')) closeModal();
         });
 
-        // ========== PHASE 4: SCENARIO FUNCTIONS ==========
+        // ========== PHASE 4: SCENARIO FUNCTIONS (MULTIPLE SCENARIOS) ==========
 
-        let currentScenario = null;
-        let scenarioAnswers = {};
+        let selectedScenarios = new Set();
+        let scenarioData = {};  // {scenarioId: {questions, answers}}
 
-        async function selectScenario(scenarioId) {
-            currentScenario = scenarioId;
-            scenarioAnswers = {};
+        // Load questions when checkboxes change
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.querySelectorAll('.scenario-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', handleScenarioToggle);
+                });
+            }, 100);
+        });
 
-            // Update UI
-            document.querySelectorAll('[id^="scenario-"]').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.getElementById(`scenario-${scenarioId}`).classList.add('active');
+        async function handleScenarioToggle(e) {
+            const scenarioId = e.target.value;
 
-            // Load questions
-            try {
-                const response = await fetch(`/api/scenario/questions?scenario_id=${scenarioId}`);
-                const data = await response.json();
-
-                if (data.success) {
-                    displayScenarioQuestions(data.data);
-                    document.getElementById('scenarioQuestionsDiv').style.display = 'block';
-                    document.getElementById('scenarioStatus').innerHTML = '';
-                } else {
-                    document.getElementById('scenarioStatus').innerHTML = `<div class="status error">Error: ${data.error}</div>`;
+            if (e.target.checked) {
+                selectedScenarios.add(scenarioId);
+                // Load questions for this scenario
+                try {
+                    const response = await fetch(`/api/scenario/questions?scenario_id=${scenarioId}`);
+                    const data = await response.json();
+                    if (data.success) {
+                        scenarioData[scenarioId] = {
+                            name: data.data.name,
+                            questions: data.data.questions,
+                            answers: {}
+                        };
+                        // Initialize default answers
+                        data.data.questions.forEach(q => {
+                            scenarioData[scenarioId].answers[q.key] = q.default;
+                        });
+                    }
+                } catch (error) {
+                    console.error(`Error loading scenario ${scenarioId}:`, error);
                 }
-            } catch (error) {
-                document.getElementById('scenarioStatus').innerHTML = `<div class="status error">Error loading scenario: ${error.message}</div>`;
+            } else {
+                selectedScenarios.delete(scenarioId);
+                delete scenarioData[scenarioId];
+            }
+
+            // Regenerate questions form
+            if (selectedScenarios.size > 0) {
+                displayScenarioQuestions();
+                document.getElementById('scenarioQuestionsDiv').style.display = 'block';
+            } else {
+                document.getElementById('scenarioQuestionsDiv').style.display = 'none';
             }
         }
 
-        function displayScenarioQuestions(scenarioData) {
-            document.getElementById('scenarioQuestionTitle').textContent = scenarioData.name;
+        function displayScenarioQuestions() {
             const container = document.getElementById('scenarioQuestionsContainer');
             container.innerHTML = '';
 
-            scenarioData.questions.forEach(q => {
-                const inputId = `input-${q.key}`;
-                const inputHtml = `
-                    <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid var(--primary);">
-                        <label style="display: block; margin-bottom: 8px; color: var(--gray-700); font-weight: 600;">
-                            ${q.question}
-                            <span style="color: var(--gray-500); font-size: 0.85em; font-weight: 400;">(${q.unit})</span>
-                        </label>
-                        <input type="text" id="${inputId}" placeholder="Default: ${q.default}"
-                            style="width: 100%; padding: 10px; border: 2px solid var(--gray-200); border-radius: 6px; font-size: 1em;"
-                            value="${q.default}">
-                        <small style="color: var(--gray-500); display: block; margin-top: 4px;">Leave empty to use default</small>
-                    </div>
-                `;
-                container.insertAdjacentHTML('beforeend', inputHtml);
-                scenarioAnswers[q.key] = q.default;
+            if (selectedScenarios.size === 0) return;
+
+            document.getElementById('scenarioQuestionTitle').textContent =
+                `Configure Scenarios (${selectedScenarios.size} selected)`;
+
+            let questionHtml = '';
+            Array.from(selectedScenarios).forEach(scenarioId => {
+                const scenario = scenarioData[scenarioId];
+                if (!scenario) return;
+
+                questionHtml += `<h4 style="margin-top: 20px; margin-bottom: 10px; color: var(--primary); padding-bottom: 8px; border-bottom: 2px solid var(--gray-200);">${scenario.name}</h4>`;
+
+                scenario.questions.forEach(q => {
+                    const inputId = `input-${scenarioId}-${q.key}`;
+                    questionHtml += `
+                        <div style="margin-bottom: 15px; padding: 12px; background: white; border-radius: 6px; border-left: 3px solid var(--primary);">
+                            <label style="display: block; margin-bottom: 6px; color: var(--gray-700); font-weight: 600; font-size: 0.95em;">
+                                ${q.question}
+                                <span style="color: var(--gray-500); font-size: 0.8em; font-weight: 400;">(${q.unit})</span>
+                            </label>
+                            <input type="text" id="${inputId}" class="scenario-input" data-scenario="${scenarioId}" data-key="${q.key}"
+                                placeholder="Default: ${q.default}"
+                                style="width: 100%; padding: 8px; border: 2px solid var(--gray-200); border-radius: 5px; font-size: 0.95em;"
+                                value="${q.default}">
+                        </div>
+                    `;
+                });
+            });
+
+            container.innerHTML = questionHtml;
+
+            // Attach change listeners to inputs
+            document.querySelectorAll('.scenario-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    const scenario = this.dataset.scenario;
+                    const key = this.dataset.key;
+                    let value = this.value || this.placeholder.match(/Default: (.*)/)[1];
+                    if (!isNaN(parseFloat(value)) && value !== '') {
+                        value = parseFloat(value);
+                    }
+                    scenarioData[scenario].answers[key] = value;
+                });
             });
         }
 
         async function submitScenario() {
-            if (!currentScenario) return;
+            if (selectedScenarios.size === 0) {
+                alert('Please select at least one scenario');
+                return;
+            }
 
-            // Gather answers
-            const scenarios = {
-                electric_vehicle: ['annual_km', 'consumption_kwh_per_100km', 'charging_hours'],
-                heat_pump: ['annual_heating_kwh', 'heating_months'],
-                solar_panels: ['annual_production_kwh', 'peak_hours'],
-                remote_work: ['additional_consumption_percent', 'working_days_per_week']
-            };
+            // Validate and gather scenarios
+            const statusDiv = document.getElementById('scenarioStatus');
+            statusDiv.innerHTML = '<div class="status loading"><span class="spinner"></span>Validating scenarios...</div>';
 
-            const keys = scenarios[currentScenario];
-            const answers = {};
+            const scenariosList = [];
+            for (const scenarioId of selectedScenarios) {
+                const scenario = scenarioData[scenarioId];
+                if (!scenario) continue;
 
-            keys.forEach(key => {
-                const input = document.getElementById(`input-${key}`);
-                let value = input.value || input.placeholder.match(/Default: (.*)/)[1];
-
-                // Convert to number if possible
-                if (!isNaN(parseFloat(value)) && value !== '') {
-                    value = parseFloat(value);
-                }
-
-                answers[key] = value;
-                scenarioAnswers[key] = value;
-            });
-
-            // Validate
-            try {
-                const response = await fetch('/api/scenario/validate', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        scenario_id: currentScenario,
-                        answers: answers
-                    })
+                // Build answers object from current values
+                const answers = {};
+                scenario.questions.forEach(q => {
+                    const input = document.getElementById(`input-${scenarioId}-${q.key}`);
+                    if (input) {
+                        let value = input.value || q.default;
+                        if (!isNaN(parseFloat(value)) && value !== '') {
+                            value = parseFloat(value);
+                        }
+                        answers[q.key] = value;
+                        scenario.answers[q.key] = value;
+                    }
                 });
-                const data = await response.json();
 
-                if (!data.valid) {
-                    document.getElementById('scenarioStatus').innerHTML =
-                        `<div class="status error">❌ Validation failed:<br>${data.errors.join('<br>')}</div>`;
+                // Validate this scenario
+                try {
+                    const response = await fetch('/api/scenario/validate', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            scenario_id: scenarioId,
+                            answers: answers
+                        })
+                    });
+                    const data = await response.json();
+
+                    if (!data.valid) {
+                        statusDiv.innerHTML =
+                            `<div class="status error">❌ Validation error in ${scenario.name}:<br>${data.errors.join('<br>')}</div>`;
+                        return;
+                    }
+
+                    scenariosList.push({
+                        scenario_id: scenarioId,
+                        answers: answers
+                    });
+                } catch (error) {
+                    statusDiv.innerHTML =
+                        `<div class="status error">❌ Validation error: ${error.message}</div>`;
                     return;
                 }
-
-                // Run simulation
-                runScenarioSimulation();
-            } catch (error) {
-                document.getElementById('scenarioStatus').innerHTML =
-                    `<div class="status error">Validation error: ${error.message}</div>`;
             }
+
+            // Run simulation with all scenarios
+            runScenarioSimulation(scenariosList);
         }
 
-        async function runScenarioSimulation() {
+        async function runScenarioSimulation(scenariosList) {
             const statusDiv = document.getElementById('scenarioStatus');
             statusDiv.innerHTML = '<div class="status loading"><span class="spinner"></span>Running scenario simulation...</div>';
 
@@ -1175,8 +1232,7 @@
                     body: JSON.stringify({
                         csv_filename: state.csvFilename,
                         tariffs: window.comparisonInput?.tariffs || [],
-                        scenario_id: currentScenario,
-                        scenario_answers: scenarioAnswers
+                        scenarios: scenariosList
                     })
                 });
                 const data = await response.json();

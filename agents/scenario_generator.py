@@ -309,3 +309,73 @@ class ScenarioProfileGenerator:
             f"{combined['kwh'].sum():.0f} kWh total"
         )
         return combined
+
+    def combine_multiple_scenarios(
+        self,
+        base_df: pd.DataFrame,
+        start_month: str,
+        end_month: str,
+        base_consumption_kwh: float,
+        scenarios: list  # List of {scenario_id, answers}
+    ) -> pd.DataFrame:
+        """
+        Combine base consumption with multiple scenarios.
+
+        Args:
+            base_df: Original consumption profile
+            start_month: Start month
+            end_month: End month
+            base_consumption_kwh: Base consumption
+            scenarios: List of scenario dicts with scenario_id and answers
+
+        Returns:
+            Combined DataFrame with all scenarios applied
+        """
+        combined_df = base_df.copy()
+
+        for scenario in scenarios:
+            scenario_id = scenario['scenario_id']
+            answers = scenario['answers']
+
+            # Generate profile for this scenario
+            if scenario_id == 'electric_vehicle':
+                scenario_df = self.generate_electric_vehicle_profile(
+                    start_month, end_month,
+                    answers.get('annual_km', 12000),
+                    answers.get('consumption_kwh_per_100km', 17),
+                    answers.get('charging_hours', '20:00-08:00')
+                )
+            elif scenario_id == 'heat_pump':
+                scenario_df = self.generate_heat_pump_profile(
+                    start_month, end_month,
+                    answers.get('annual_heating_kwh', 4000),
+                    answers.get('heating_months', '10,11,12,1,2,3,4')
+                )
+            elif scenario_id == 'solar_panels':
+                scenario_df = self.generate_solar_panels_profile(
+                    start_month, end_month,
+                    answers.get('annual_production_kwh', 3000),
+                    answers.get('peak_hours', '08:00-16:00')
+                )
+            elif scenario_id == 'remote_work':
+                scenario_df = self.generate_remote_work_profile(
+                    start_month, end_month,
+                    base_consumption_kwh,
+                    answers.get('additional_consumption_percent', 15),
+                    answers.get('working_days_per_week', 5)
+                )
+            else:
+                continue
+
+            # Combine with current combined_df
+            combined_df = pd.concat([combined_df, scenario_df], ignore_index=True)
+
+        # Sort and aggregate
+        combined_df['timestamp'] = pd.to_datetime(combined_df['timestamp'])
+        combined_df = combined_df.sort_values('timestamp').reset_index(drop=True)
+
+        logger.info(
+            f"Combined {len(scenarios)} scenarios: {len(combined_df)} intervals, "
+            f"{combined_df['kwh'].sum():.0f} kWh total"
+        )
+        return combined_df
