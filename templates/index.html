@@ -269,9 +269,80 @@
             <div class="card">
                 <h2 style="display: none;">💰 Comparison Results</h2>
                 <div id="resultsContainer"></div>
-                <button class="btn-secondary" onclick="selectMoreTariffs()" style="width: 100%; margin-top: 20px;">
-                    ← Select Different Tariffs
-                </button>
+                <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                    <button class="btn-primary" onclick="goToScenarios()" style="flex: 1;">
+                        🎯 Explore Scenarios (Phase 4)
+                    </button>
+                    <button class="btn-secondary" onclick="selectMoreTariffs()" style="flex: 1;">
+                        ← Select Different Tariffs
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: SCENARIOS (PHASE 4) -->
+        <div id="scenariosSection" class="section">
+            <div class="card">
+                <h2>🎯 Phase 4: Explore Consumption Scenarios</h2>
+                <p style="margin: 15px 0; color: var(--gray-700);">
+                    What if your consumption changes? Explore scenarios like adding an electric vehicle, heat pump, solar panels, or remote work.
+                </p>
+
+                <!-- Scenario Selection -->
+                <h3 style="margin-top: 20px; margin-bottom: 15px;">Select a Scenario:</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                    <div class="provider-btn" onclick="selectScenario('electric_vehicle')" id="scenario-electric_vehicle">
+                        🚗 Electric Vehicle
+                    </div>
+                    <div class="provider-btn" onclick="selectScenario('heat_pump')" id="scenario-heat_pump">
+                        🔥 Heat Pump
+                    </div>
+                    <div class="provider-btn" onclick="selectScenario('solar_panels')" id="scenario-solar_panels">
+                        ☀️ Solar Panels
+                    </div>
+                    <div class="provider-btn" onclick="selectScenario('remote_work')" id="scenario-remote_work">
+                        💻 Remote Work
+                    </div>
+                </div>
+
+                <!-- Scenario Questions Form -->
+                <div id="scenarioQuestionsDiv" style="display: none; background: var(--gray-50); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 id="scenarioQuestionTitle" style="margin-bottom: 15px;"></h3>
+                    <div id="scenarioQuestionsContainer"></div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="btn-secondary" onclick="clearScenario()" style="flex: 1;">← Back</button>
+                        <button class="btn-primary" onclick="submitScenario()" style="flex: 1;">Run Scenario Simulation →</button>
+                    </div>
+                </div>
+
+                <div id="scenarioStatus"></div>
+            </div>
+
+            <!-- Scenario Results: Side-by-side Rankings -->
+            <div id="scenarioResultsDiv" style="display: none;">
+                <div class="card" style="margin-top: 20px;">
+                    <h2>📊 Scenario Comparison Results</h2>
+                    <div id="scenarioComparisonSummary" style="background: var(--gray-50); padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <!-- Base Ranking -->
+                        <div>
+                            <h3 style="color: var(--primary); margin-bottom: 15px; text-align: center;">📋 Base Ranking</h3>
+                            <div id="baseRankingContainer"></div>
+                        </div>
+
+                        <!-- Scenario Ranking -->
+                        <div>
+                            <h3 style="color: var(--primary); margin-bottom: 15px; text-align: center;">🎯 With Scenario</h3>
+                            <div id="scenarioRankingContainer"></div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                        <button class="btn-secondary" onclick="goToScenarios()" style="flex: 1;">← Try Another Scenario</button>
+                        <button class="btn-secondary" onclick="selectMoreTariffs()" style="flex: 1;">⚡ Change Tariff Selection</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -554,6 +625,9 @@
             }
 
             const selected = state.allTariffs.filter(t => state.selectedTariffs.has(`${t.supplier}_${t.plan_name}`));
+
+            // Store for Phase 4 (scenarios)
+            window.comparisonInput.tariffs = selected;
 
             try {
                 const response = await fetch('/api/simulate', {
@@ -980,6 +1054,236 @@
         document.getElementById('detailsModal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('detailsModal')) closeModal();
         });
+
+        // ========== PHASE 4: SCENARIO FUNCTIONS ==========
+
+        let currentScenario = null;
+        let scenarioAnswers = {};
+
+        async function selectScenario(scenarioId) {
+            currentScenario = scenarioId;
+            scenarioAnswers = {};
+
+            // Update UI
+            document.querySelectorAll('[id^="scenario-"]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`scenario-${scenarioId}`).classList.add('active');
+
+            // Load questions
+            try {
+                const response = await fetch(`/api/scenario/questions?scenario_id=${scenarioId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayScenarioQuestions(data.data);
+                    document.getElementById('scenarioQuestionsDiv').style.display = 'block';
+                    document.getElementById('scenarioStatus').innerHTML = '';
+                } else {
+                    document.getElementById('scenarioStatus').innerHTML = `<div class="status error">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                document.getElementById('scenarioStatus').innerHTML = `<div class="status error">Error loading scenario: ${error.message}</div>`;
+            }
+        }
+
+        function displayScenarioQuestions(scenarioData) {
+            document.getElementById('scenarioQuestionTitle').textContent = scenarioData.name;
+            const container = document.getElementById('scenarioQuestionsContainer');
+            container.innerHTML = '';
+
+            scenarioData.questions.forEach(q => {
+                const inputId = `input-${q.key}`;
+                const inputHtml = `
+                    <div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border-left: 4px solid var(--primary);">
+                        <label style="display: block; margin-bottom: 8px; color: var(--gray-700); font-weight: 600;">
+                            ${q.question}
+                            <span style="color: var(--gray-500); font-size: 0.85em; font-weight: 400;">(${q.unit})</span>
+                        </label>
+                        <input type="text" id="${inputId}" placeholder="Default: ${q.default}"
+                            style="width: 100%; padding: 10px; border: 2px solid var(--gray-200); border-radius: 6px; font-size: 1em;"
+                            value="${q.default}">
+                        <small style="color: var(--gray-500); display: block; margin-top: 4px;">Leave empty to use default</small>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', inputHtml);
+                scenarioAnswers[q.key] = q.default;
+            });
+        }
+
+        async function submitScenario() {
+            if (!currentScenario) return;
+
+            // Gather answers
+            const scenarios = {
+                electric_vehicle: ['annual_km', 'consumption_kwh_per_100km', 'charging_hours'],
+                heat_pump: ['annual_heating_kwh', 'heating_months'],
+                solar_panels: ['annual_production_kwh', 'peak_hours'],
+                remote_work: ['additional_consumption_percent', 'working_days_per_week']
+            };
+
+            const keys = scenarios[currentScenario];
+            const answers = {};
+
+            keys.forEach(key => {
+                const input = document.getElementById(`input-${key}`);
+                let value = input.value || input.placeholder.match(/Default: (.*)/)[1];
+
+                // Convert to number if possible
+                if (!isNaN(parseFloat(value)) && value !== '') {
+                    value = parseFloat(value);
+                }
+
+                answers[key] = value;
+                scenarioAnswers[key] = value;
+            });
+
+            // Validate
+            try {
+                const response = await fetch('/api/scenario/validate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        scenario_id: currentScenario,
+                        answers: answers
+                    })
+                });
+                const data = await response.json();
+
+                if (!data.valid) {
+                    document.getElementById('scenarioStatus').innerHTML =
+                        `<div class="status error">❌ Validation failed:<br>${data.errors.join('<br>')}</div>`;
+                    return;
+                }
+
+                // Run simulation
+                runScenarioSimulation();
+            } catch (error) {
+                document.getElementById('scenarioStatus').innerHTML =
+                    `<div class="status error">Validation error: ${error.message}</div>`;
+            }
+        }
+
+        async function runScenarioSimulation() {
+            const statusDiv = document.getElementById('scenarioStatus');
+            statusDiv.innerHTML = '<div class="status loading"><span class="spinner"></span>Running scenario simulation...</div>';
+
+            try {
+                const response = await fetch('/api/scenario-simulation', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        csv_filename: state.csvFilename,
+                        tariffs: window.comparisonInput?.tariffs || [],
+                        scenario_id: currentScenario,
+                        scenario_answers: scenarioAnswers
+                    })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    displayScenarioResults(data);
+                    document.getElementById('scenarioQuestionsDiv').style.display = 'none';
+                    document.getElementById('scenarioResultsDiv').style.display = 'block';
+                    statusDiv.innerHTML = '';
+                } else {
+                    statusDiv.innerHTML = `<div class="status error">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">Simulation error: ${error.message}</div>`;
+            }
+        }
+
+        function displayScenarioResults(data) {
+            const analysis = data;
+
+            // Summary
+            const summaryHtml = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                    <div class="metric">
+                        <div class="metric-value">${analysis.base_consumption_kwh.toFixed(0)}</div>
+                        <div class="metric-label">Base kWh/year</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" style="color: ${analysis.consumption_change_kwh > 0 ? '#ef4444' : '#10b981'}">
+                            ${analysis.consumption_change_kwh > 0 ? '+' : ''}${analysis.consumption_change_kwh.toFixed(0)}
+                        </div>
+                        <div class="metric-label">Additional kWh</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${analysis.scenario_consumption_kwh.toFixed(0)}</div>
+                        <div class="metric-label">Total With Scenario</div>
+                    </div>
+                </div>
+                <div style="background: var(--gray-50); padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <strong>Scenario:</strong> ${analysis.scenario_summary}
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                    <div>
+                        <strong>Best Base:</strong> ${analysis.comparison.best_tariff_base}<br>
+                        <span style="font-size: 1.3em; color: var(--primary); font-weight: bold;">€${analysis.comparison.best_cost_base.toFixed(2)}/year</span>
+                    </div>
+                    <div>
+                        <strong>Best With Scenario:</strong> ${analysis.comparison.best_tariff_scenario}<br>
+                        <span style="font-size: 1.3em; color: ${analysis.comparison.cost_difference < 0 ? '#10b981' : '#ef4444'}; font-weight: bold;">
+                            ${analysis.comparison.cost_difference < 0 ? '✓ Saves' : 'Costs'} €${Math.abs(analysis.comparison.cost_difference).toFixed(2)}
+                        </span>
+                    </div>
+                </div>
+            `;
+            document.getElementById('scenarioComparisonSummary').innerHTML = summaryHtml;
+
+            // Display rankings side-by-side
+            displayScenarioRankings(data.ranking_base, data.ranking_scenario);
+        }
+
+        function displayScenarioRankings(baseRanking, scenarioRanking) {
+            // Base Ranking
+            let baseHtml = '';
+            baseRanking.slice(0, 5).forEach((tariff, idx) => {
+                baseHtml += `
+                    <div style="background: ${idx === 0 ? '#d1fae5' : 'var(--gray-50)'}; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid ${idx === 0 ? '#10b981' : 'var(--gray-300)'};">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-weight: 600; color: var(--primary);">#${idx + 1} ${tariff.plan_name}</span>
+                            <span style="font-size: 1.2em; font-weight: bold; color: ${idx === 0 ? '#10b981' : 'var(--primary)'};">€${tariff.total_cost_eur.toFixed(0)}</span>
+                        </div>
+                        <small style="color: var(--gray-700);">${tariff.supplier}</small>
+                    </div>
+                `;
+            });
+            document.getElementById('baseRankingContainer').innerHTML = baseHtml;
+
+            // Scenario Ranking
+            let scenarioHtml = '';
+            scenarioRanking.slice(0, 5).forEach((tariff, idx) => {
+                scenarioHtml += `
+                    <div style="background: ${idx === 0 ? '#d1fae5' : 'var(--gray-50)'}; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid ${idx === 0 ? '#10b981' : 'var(--gray-300)'};">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-weight: 600; color: var(--primary);">#${idx + 1} ${tariff.plan_name}</span>
+                            <span style="font-size: 1.2em; font-weight: bold; color: ${idx === 0 ? '#10b981' : 'var(--primary)'};">€${tariff.total_cost_eur.toFixed(0)}</span>
+                        </div>
+                        <small style="color: var(--gray-700);">${tariff.supplier}</small>
+                    </div>
+                `;
+            });
+            document.getElementById('scenarioRankingContainer').innerHTML = scenarioHtml;
+        }
+
+        function goToScenarios() {
+            showSection('scenariosSection');
+            document.getElementById('scenarioResultsDiv').style.display = 'none';
+            document.getElementById('scenarioQuestionsDiv').style.display = 'none';
+        }
+
+        function clearScenario() {
+            currentScenario = null;
+            scenarioAnswers = {};
+            document.querySelectorAll('[id^="scenario-"]').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('scenarioQuestionsDiv').style.display = 'none';
+        }
+
+        // Store comparison input for scenario access
+        window.comparisonInput = {};
     </script>
 </body>
 </html>

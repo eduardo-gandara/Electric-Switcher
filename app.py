@@ -20,6 +20,8 @@ from src.consumption_processor import ConsumptionProcessor
 from agents.advisor import AdvisorAgent
 from agents.tariff_collector import TariffCollector
 from agents.advisor_analyzer import SensitivityAnalyzer, RiskAnalyzer, AdvisorRecommender
+from agents.scenario_agent import ScenarioAgent
+from agents.scenario_generator import ScenarioProfileGenerator
 
 # Custom JSON encoder for numpy types
 class NumpyEncoder(json.JSONEncoder):
@@ -444,6 +446,193 @@ def analyze_tariffs():
                 'recommendation': recommendation,
                 'total_tariffs': len(ranked),
                 'consumption_kwh': consumption_kwh
+            }
+        })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/scenario/questions', methods=['GET'])
+def scenario_questions():
+    """Get questions for a scenario (Phase 4)"""
+    try:
+        scenario_id = request.args.get('scenario_id', 'electric_vehicle')
+        agent = ScenarioAgent()
+        questions = agent.get_scenario_questions(scenario_id)
+        return jsonify({'success': True, 'data': questions})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/scenario/validate', methods=['POST'])
+def scenario_validate():
+    """Validate scenario answers"""
+    try:
+        data = request.get_json() or {}
+        scenario_id = data.get('scenario_id', 'electric_vehicle')
+        answers = data.get('answers', {})
+
+        agent = ScenarioAgent()
+        validation = agent.validate_scenario_input(scenario_id, answers)
+
+        if validation['valid']:
+            summary = agent.generate_scenario_summary(scenario_id, answers)
+            return jsonify({
+                'success': True,
+                'valid': True,
+                'summary': summary,
+                'scenario_id': scenario_id
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'valid': False,
+                'errors': validation.get('errors', [])
+            })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/scenario-simulation', methods=['POST'])
+def scenario_simulation():
+    """
+    Phase 4: Run simulation comparing base consumption vs. consumption with scenario.
+    Returns two rankings side-by-side.
+    """
+    try:
+        data = request.get_json() or {}
+
+        # Parameters
+        csv_filename = data.get('csv_filename', '')
+        tariffs_data = data.get('tariffs', [])
+        scenario_id = data.get('scenario_id', 'electric_vehicle')
+        scenario_answers = data.get('scenario_answers', {})
+
+        if not csv_filename or not tariffs_data:
+            return jsonify({'success': False, 'error': 'Missing csv_filename or tariffs'}), 400
+
+        # Load CSV
+        csv_path = UPLOAD_FOLDER / csv_filename
+        if not csv_path.exists():
+            return jsonify({'success': False, 'error': f'CSV file not found: {csv_filename}'}), 400
+
+        # Process consumption
+        try:
+            processor = ConsumptionProcessor(str(csv_path))
+            processor.clean()
+            profile_df = processor.build_profile()
+            base_consumption_profile = ConsumptionProfile(profile_df)
+        except Exception as e:
+            return jsonify({'success': False, 'error': f'CSV processing error: {str(e)}'}), 400
+
+        # Auto-detect date range
+        start_month = None
+        end_month = None
+        if profile_df is not None and len(profile_df) > 0:
+            min_date = profile_df['timestamp'].min()
+            max_date = profile_df['timestamp'].max()
+            if pd.notna(min_date) and pd.notna(max_date):
+                start_month = min_date.strftime('%Y-%m')
+                end_month = max_date.strftime('%Y-%m')
+
+        if not start_month or not end_month:
+            return jsonify({'success': False, 'error': 'Invalid date range in CSV'}), 400
+
+        # Generate scenario profile
+        generator = ScenarioProfileGenerator()
+        base_consumption_kwh = profile_df['kwh'].sum()
+
+        if scenario_id == 'electric_vehicle':
+            scenario_df = generator.generate_electric_vehicle_profile(
+                start_month,
+                end_month,
+                scenario_answers.get('annual_km', 12000),
+                scenario_answers.get('consumption_kwh_per_100km', 17),
+                scenario_answers.get('charging_hours', '20:00-08:00')
+            )
+        elif scenario_id == 'heat_pump':
+            scenario_df = generator.generate_heat_pump_profile(
+                start_month,
+                end_month,
+                scenario_answers.get('annual_heating_kwh', 4000),
+                scenario_answers.get('heating_months', '10,11,12,1,2,3,4')
+            )
+        elif scenario_id == 'solar_panels':
+            scenario_df = generator.generate_solar_panels_profile(
+                start_month,
+                end_month,
+                scenario_answers.get('annual_production_kwh', 3000),
+                scenario_answers.get('peak_hours', '08:00-16:00')
+            )
+        elif scenario_id == 'remote_work':
+            scenario_df = generator.generate_remote_work_profile(
+                start_month,
+                end_month,
+                base_consumption_kwh,
+                scenario_answers.get('additional_consumption_percent', 15),
+                scenario_answers.get('working_days_per_week', 5)
+            )
+        else:
+            return jsonify({'success': False, 'error': f'Unknown scenario: {scenario_id}'}), 400
+
+        # Combine profiles
+        combined_df = generator.combine_profiles(profile_df, scenario_df)
+        combined_consumption_profile = ConsumptionProfile(combined_df)
+
+        # Run simulations
+        tariffs = [TariffRecord.from_dict(t) for t in tariffs_data]
+        reference_tariff = create_default_bord_gais_tariff()
+
+        engine_base = SimulationEngine(base_consumption_profile)
+        engine_scenario = SimulationEngine(combined_consumption_profile)
+
+        results_base = engine_base.compare_tariffs(
+            tariffs,
+            start_month,
+            end_month,
+            reference_tariff
+        )
+
+        results_scenario = engine_scenario.compare_tariffs(
+            tariffs,
+            start_month,
+            end_month,
+            reference_tariff
+        )
+
+        # Convert to JSON-serializable
+        results_base = convert_numpy_types(results_base)
+        results_scenario = convert_numpy_types(results_scenario)
+
+        # Generate scenario summary
+        agent = ScenarioAgent()
+        scenario_summary = agent.generate_scenario_summary(scenario_id, scenario_answers)
+
+        return jsonify({
+            'success': True,
+            'scenario_id': scenario_id,
+            'scenario_summary': scenario_summary,
+            'base_consumption_kwh': round(base_consumption_kwh, 2),
+            'scenario_consumption_kwh': round(combined_df['kwh'].sum(), 2),
+            'consumption_change_kwh': round(combined_df['kwh'].sum() - base_consumption_kwh, 2),
+            'ranking_base': results_base,
+            'ranking_scenario': results_scenario,
+            'comparison': {
+                'best_tariff_base': results_base[0]['plan_name'] if results_base else 'N/A',
+                'best_cost_base': results_base[0]['total_cost_eur'] if results_base else 0,
+                'best_tariff_scenario': results_scenario[0]['plan_name'] if results_scenario else 'N/A',
+                'best_cost_scenario': results_scenario[0]['total_cost_eur'] if results_scenario else 0,
+                'cost_difference': round(
+                    (results_scenario[0]['total_cost_eur'] if results_scenario else 0) -
+                    (results_base[0]['total_cost_eur'] if results_base else 0),
+                    2
+                )
             }
         })
 
