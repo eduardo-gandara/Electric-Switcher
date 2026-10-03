@@ -230,6 +230,11 @@ class SimulationEngine:
             total_cost += monthly_cost['total_eur']
             total_consumption += monthly_cost['consumption_kwh']
 
+        # Calculate annualized cost (extrapolated to 12 months)
+        months_available = len(monthly_costs) if monthly_costs else 1
+        avg_monthly_cost = total_cost / months_available
+        annualized_cost = avg_monthly_cost * 12
+
         return {
             'supplier': tariff.supplier,
             'plan_name': tariff.plan_name,
@@ -238,8 +243,9 @@ class SimulationEngine:
             'period': f"{start_month} a {end_month}",
             'months': len(monthly_costs),
             'total_consumption_kwh': total_consumption,
-            'total_cost_eur': round(total_cost, 2),
-            'average_cost_monthly': round(total_cost / len(monthly_costs), 2),
+            'total_cost_eur': round(annualized_cost, 2),  # Annualized to 12 months
+            'actual_period_cost_eur': round(total_cost, 2),  # Actual cost for available months
+            'average_cost_monthly': round(avg_monthly_cost, 2),
             'monthly_breakdown': monthly_costs,
             'discount': tariff.discount,
             'cashback': tariff.cashback_eur,
