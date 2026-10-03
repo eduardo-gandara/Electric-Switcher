@@ -64,7 +64,12 @@
       "Bash(nohup bash -c 'source venv/bin/activate && GEMINI_API_KEY=\"AIzaSyDZIU2m0q5YxUuth20BVS9YHh_FUTUPOtU\" python3 app.py')",
       "Bash(python3 -m py_compile app.py)",
       "Bash(timeout 5 bash -c 'source venv/bin/activate && GEMINI_API_KEY=\"AIzaSyDZIU2m0q5YxUuth20BVS9YHh_FUTUPOtU\" python3 app.py 2>&1')",
-      "Bash(nohup bash -c 'source venv/bin/activate && GEMINI_API_KEY=\"AIzaSyDZIU2m0q5YxUuth20BVS9YHh_FUTUPOtU\" python3 -u app.py 2>&1')"
+      "Bash(nohup bash -c 'source venv/bin/activate && GEMINI_API_KEY=\"AIzaSyDZIU2m0q5YxUuth20BVS9YHh_FUTUPOtU\" python3 -u app.py 2>&1')",
+      "Bash(git commit -m 'fix: handle monthly_costs as dict in advisor analysis *)",
+      "Bash(curl -s -X POST -F \"file=@/tmp/test.csv\" http://localhost:5000/api/upload-csv)",
+      "Bash(node -c templates/index.html)",
+      "Bash(curl -s http://localhost:5000)",
+      "Bash(git commit -m 'fix: correct JavaScript syntax error in analyzeCollectedTariffs *)"
     ]
   }
 }

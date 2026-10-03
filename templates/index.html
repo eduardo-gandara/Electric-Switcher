@@ -267,7 +267,7 @@
         <!-- SECTION 3: RESULTS -->
         <div id="resultsSection" class="section">
             <div class="card">
-                <h2>💰 Comparison Results</h2>
+                <h2 style="display: none;">💰 Comparison Results</h2>
                 <div id="resultsContainer"></div>
                 <button class="btn-secondary" onclick="selectMoreTariffs()" style="width: 100%; margin-top: 20px;">
                     ← Select Different Tariffs
@@ -636,19 +636,17 @@
             const { ranking, recommendation } = analysis;
 
             let html = `
-            <div style="margin-top: 30px; border-top: 2px solid var(--gray-200); padding-top: 30px;">
-                <h2 style="color: var(--primary); margin-bottom: 20px;">📊 Ranking y Análisis (Fase 3)</h2>
-
+            <div style="margin-top: 30px;">
                 <div style="background: linear-gradient(135deg, var(--success) 0%, #10b981 100%); color: white; padding: 25px; border-radius: 12px; margin-bottom: 30px;">
-                    <h3 style="margin: 0 0 10px 0; font-size: 1.3em;">✨ Recomendación</h3>
+                    <h3 style="margin: 0 0 10px 0; font-size: 1.3em;">✨ Recommendation</h3>
                     <p style="margin: 10px 0; font-size: 1.1em; font-weight: bold;">${recommendation.tariff_name}</p>
                     <p style="margin: 10px 0; font-size: 0.95em; opacity: 0.95;">${recommendation.supplier}</p>
-                    <p style="margin: 15px 0 0 0; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 15px; font-size: 1.6em; font-weight: bold;">€${recommendation.annual_cost.toFixed(2)}/año</p>
+                    <p style="margin: 15px 0 0 0; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 15px; font-size: 1.6em; font-weight: bold;">€${recommendation.annual_cost.toFixed(2)}/year</p>
                     <p style="margin: 10px 0 0 0; font-size: 0.9em; line-height: 1.6;">${recommendation.text}</p>
                 </div>
 
-                <h3 style="color: var(--primary); margin-bottom: 15px;">🏆 Ranking de Tarifas</h3>
-                <div style="display: grid; gap: 15px;">
+                <h2 style="color: var(--primary); margin-bottom: 20px;">🏆 Tariff Ranking</h2>
+                <div style="display: grid; gap: 20px;">
             `;
 
             ranking.forEach((item, idx) => {
@@ -656,6 +654,8 @@
                 const sensitivity = item.sensitivity;
                 const risks = item.risks;
                 const isBest = idx === 0;
+                const monthlyCosts = item.sensitivity_detailed.base || [];
+                const maxCost = Math.max(...monthlyCosts, item.annual_cost / 12);
 
                 html += `
                     <div style="background: white; border: 2px solid ${isBest ? 'var(--success)' : 'var(--gray-200)'}; padding: 20px; border-radius: 12px;">
@@ -667,37 +667,51 @@
                             </div>
                             <div style="text-align: right;">
                                 <div style="font-size: 1.6em; font-weight: bold; color: var(--primary);">€${item.annual_cost.toFixed(2)}</div>
-                                <div style="font-size: 0.85em; color: var(--gray-700);">/año</div>
+                                <div style="font-size: 0.85em; color: var(--gray-700);">/year</div>
+                                <div style="font-size: 0.85em; color: var(--gray-600);">≈ €${(item.annual_cost / 12).toFixed(2)}/month</div>
                             </div>
                         </div>
 
                         ${item.annual_savings > 0 ? `
                             <div style="background: #d1fae5; padding: 10px; border-radius: 6px; color: #065f46; margin-bottom: 15px; font-weight: 500; font-size: 0.9em;">
-                                💰 Ahorra €${item.annual_savings.toFixed(2)} (${item.savings_percent}%)
+                                💰 Save €${item.annual_savings.toFixed(2)} (${item.savings_percent}%)
                             </div>
                         ` : ''}
 
+                        <div style="margin-bottom: 15px;">
+                            <p style="margin: 0 0 10px 0; font-size: 0.9em; font-weight: 600; color: var(--gray-600);">24-Month Cost Breakdown</p>
+                            <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-bottom: 10px;">
+                                ${monthlyCosts.map((cost, m) => {
+                                    const percent = (cost / maxCost) * 100;
+                                    return `<div style="text-align: center;">
+                                        <div style="background: var(--primary); opacity: ${0.4 + (percent / 100) * 0.6}; height: 30px; border-radius: 4px; margin-bottom: 4px;"></div>
+                                        <small style="font-size: 0.7em; color: var(--gray-600);">€${cost.toFixed(0)}</small>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                        </div>
+
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--gray-200);">
                             <div>
-                                <p style="margin: 0 0 8px 0; font-size: 0.85em; color: var(--gray-600); font-weight: 600;">Sensibilidad</p>
+                                <p style="margin: 0 0 8px 0; font-size: 0.85em; color: var(--gray-600); font-weight: 600;">Sensitivity (±20% consumption)</p>
                                 <p style="margin: 0; font-size: 0.9em;">
                                     -20%: €${sensitivity.low_20_annual.toFixed(0)}<br>
                                     Base: €${sensitivity.base_annual.toFixed(0)}<br>
                                     +20%: €${sensitivity.high_20_annual.toFixed(0)}
                                 </p>
-                                <p style="margin: 8px 0 0 0; font-size: 0.8em; color: var(--gray-600);">Rango: €${sensitivity.variance.toFixed(0)}</p>
+                                <p style="margin: 8px 0 0 0; font-size: 0.8em; color: var(--gray-600);">Range: €${sensitivity.variance.toFixed(0)}</p>
                             </div>
                             <div>
-                                <p style="margin: 0 0 8px 0; font-size: 0.85em; color: var(--gray-600); font-weight: 600;">Riesgos (${risks.count})</p>
+                                <p style="margin: 0 0 8px 0; font-size: 0.85em; color: var(--gray-600); font-weight: 600;">Risks (${risks.count})</p>
                                 <p style="margin: 0; font-size: 0.9em;">
-                                    ${risks.risks.length === 0 ? '✅ Sin riesgos' : risks.risks.map(r => `${r.icon} ${r.title}`).join('<br>')}
+                                    ${risks.risks.length === 0 ? '✅ No risks' : risks.risks.map(r => `${r.icon} ${r.title}`).join('<br>')}
                                 </p>
                             </div>
                         </div>
 
                         <div style="display: flex; gap: 10px; font-size: 0.9em;">
                             <button onclick="showAdvisorDetails(${idx})" style="flex: 1; padding: 10px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
-                                📋 Ver detalles
+                                📋 View Details
                             </button>
                         </div>
                     </div>
@@ -808,7 +822,8 @@
                 html += '</div>';
             }
 
-            document.getElementById('resultsContainer').innerHTML = html;
+            // Hide comparison results, only show ranking
+            document.getElementById('resultsContainer').innerHTML = '';
         }
 
         function showMonthlyBreakdown(index) {
