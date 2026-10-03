@@ -667,8 +667,8 @@
                             </div>
                             <div style="text-align: right;">
                                 <div style="font-size: 1.6em; font-weight: bold; color: var(--primary);">€${item.annual_cost.toFixed(2)}</div>
-                                <div style="font-size: 0.85em; color: var(--gray-700);">/year</div>
-                                <div style="font-size: 0.85em; color: var(--gray-600);">≈ €${(item.annual_cost / 12).toFixed(2)}/month</div>
+                                <div style="font-size: 0.85em; color: var(--gray-700);">/${monthlyCosts.length} months</div>
+                                <div style="font-size: 0.85em; color: var(--gray-600);">≈ €${(item.annual_cost / monthlyCosts.length).toFixed(2)}/month</div>
                             </div>
                         </div>
 

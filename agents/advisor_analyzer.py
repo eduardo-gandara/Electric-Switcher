@@ -178,23 +178,24 @@ class AdvisorRecommender:
     @staticmethod
     def get_recommendation(ranked_tariffs: List[Dict]) -> Dict:
         """
-        Genera recomendación final basada en:
-        - Mejor costo
-        - Nivel de riesgo
-        - Sensibilidad a cambios
+        Generates final recommendation based on:
+        - Best cost
+        - Risk level
+        - Sensitivity to changes
         """
         if not ranked_tariffs:
             return {
                 "tariff_name": "N/A",
                 "supplier": "N/A",
-                "text": "No hay tarifas disponibles para analizar.",
+                "text": "No tariffs available for analysis.",
                 "reasoning": []
             }
 
         best = ranked_tariffs[0]
+        num_months = len(best.get('monthly_costs', []))
 
         reasoning = [
-            f"Mejor costo anual: €{best['annual_cost']:.2f}"
+            f"Best total cost ({num_months} months): €{best['annual_cost']:.2f}"
         ]
 
         # Analizar sensibilidad
@@ -223,7 +224,7 @@ class AdvisorRecommender:
         recommendation_text = (
             f"We recommend **{best['tariff']['plan_name']}** from "
             f"**{best['tariff']['supplier']}**. "
-            f"It's the most economical option over 12 months (€{best['annual_cost']:.2f}) "
+            f"It's the most economical option over {num_months} months (€{best['annual_cost']:.2f}) "
             f"and offers a good balance between cost and stability. "
         )
 
