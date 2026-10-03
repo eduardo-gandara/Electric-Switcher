@@ -60,7 +60,11 @@
       "Bash(sed -i '655s/viewBox=\"0 0 100 310\"/viewBox=\"0 0 100 300\"/' ~/Projects/Electric-Switcher/templates/index.html)",
       "Bash(sed -i '656s/y=\"20\"/y=\"18\"/' ~/Projects/Electric-Switcher/templates/index.html)",
       "Bash(sed -i '656s/y2=\"240\"/y2=\"${chartHeight}\"/' ~/Projects/Electric-Switcher/templates/index.html)",
-      "Bash(sed -i '656s/stroke-width=\"1.5\"/stroke-width=\"1\"/' ~/Projects/Electric-Switcher/templates/index.html)"
+      "Bash(sed -i '656s/stroke-width=\"1.5\"/stroke-width=\"1\"/' ~/Projects/Electric-Switcher/templates/index.html)",
+      "Bash(nohup bash -c 'source venv/bin/activate && GEMINI_API_KEY=\"AIzaSyDZIU2m0q5YxUuth20BVS9YHh_FUTUPOtU\" python3 app.py')",
+      "Bash(python3 -m py_compile app.py)",
+      "Bash(timeout 5 bash -c 'source venv/bin/activate && GEMINI_API_KEY=\"AIzaSyDZIU2m0q5YxUuth20BVS9YHh_FUTUPOtU\" python3 app.py 2>&1')",
+      "Bash(nohup bash -c 'source venv/bin/activate && GEMINI_API_KEY=\"AIzaSyDZIU2m0q5YxUuth20BVS9YHh_FUTUPOtU\" python3 -u app.py 2>&1')"
     ]
   }
 }

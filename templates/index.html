@@ -590,11 +590,17 @@
                 const consumptionKwh = state.totalConsumption || 3000;
 
                 // Convert simulation results to tariff format for analysis
-                const tariffsForAnalysis = simulationResults.map(result => ({
+                const tariffsForAnalysis = simulationResults.map(result => {
+                    // Extract monthly costs as numbers from breakdown (which contains dicts)
+                    const monthlyCosts = (result.monthly_breakdown || []).map(m =>
+                        typeof m === 'object' ? (m.total_eur || 0) : m
+                    );
+
+                    return {
                     plan_name: result.plan_name,
                     supplier: result.supplier,
                     annual_cost: result.total_cost_eur,
-                    monthly_costs: result.monthly_breakdown || [],
+                    monthly_costs: monthlyCosts,
                     unit_rates_c_per_kwh_ex_vat: result.unit_rates_c_per_kwh_ex_vat || {},
                     standing_charge_c_per_day: result.standing_charge_c_per_day || 0,
                     discount: result.discount || {},

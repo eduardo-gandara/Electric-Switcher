@@ -396,7 +396,12 @@ def analyze_tariffs():
 
             # Monthly costs (asumimos 24 meses)
             monthly_costs = tariff_data.get('monthly_costs', [])
-            if not monthly_costs:
+
+            # Extract numbers from monthly costs (handle both list of dicts and list of numbers)
+            if monthly_costs and isinstance(monthly_costs[0], dict):
+                monthly_costs = [m.get('total_eur', 0) if isinstance(m, dict) else m for m in monthly_costs]
+
+            if not monthly_costs or len(monthly_costs) == 0:
                 # Fallback: calcular costo anual / 12
                 annual = tariff_data.get('annual_cost', 1200)
                 monthly_costs = [annual / 12] * 12
